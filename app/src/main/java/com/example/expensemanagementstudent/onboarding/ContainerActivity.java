@@ -68,7 +68,7 @@ public class ContainerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Skip the onboarding and go to LoginActivity immediately
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 finish();
             }
         });

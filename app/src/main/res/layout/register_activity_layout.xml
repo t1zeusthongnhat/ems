@@ -75,7 +75,7 @@
             app:boxStrokeColor="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextUsername"
+                android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Username"
@@ -98,7 +98,7 @@
             app:boxStrokeColor="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextEmail"
+                android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
@@ -222,7 +222,7 @@
         </RelativeLayout>
 
         <Button
-            android:id="@+id/buttonRegister"
+            android:id="@+id/btnRegis"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvtext"
