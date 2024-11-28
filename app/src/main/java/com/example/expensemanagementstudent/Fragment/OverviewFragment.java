@@ -1,5 +1,6 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,8 +8,15 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.expensemanagementstudent.AllTransactionsActivity;
 import com.example.expensemanagementstudent.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +24,9 @@ import com.example.expensemanagementstudent.R;
  * create an instance of this fragment.
  */
 public class OverviewFragment extends Fragment {
+
+    private TextView monthYearDisplay;
+    private Calendar calendar;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,9 +69,56 @@ public class OverviewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_overview, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
+
+        // Find the "See All" button
+        TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
+
+
+        // Initialize views
+        monthYearDisplay = rootView.findViewById(R.id.month_year_display);
+        ImageView previousMonth = rootView.findViewById(R.id.previous_month);
+        ImageView nextMonth = rootView.findViewById(R.id.next_month);
+
+        // Initialize calendar
+        calendar = Calendar.getInstance();
+        updateMonthYearDisplay();
+
+        // Set up button listeners
+        previousMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Move calendar to the previous month
+                calendar.add(Calendar.MONTH, -1);
+                updateMonthYearDisplay();
+            }
+        });
+        nextMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Move calendar to the next month
+                calendar.add(Calendar.MONTH, 1);
+                updateMonthYearDisplay();
+            }
+        });
+        // Set click listener for "See All" button
+        seeAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), AllTransactionsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        return rootView;
     }
+    private void updateMonthYearDisplay() {
+        // Format and display the month and year
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(calendar.getTime());
+        monthYearDisplay.setText(formattedDate);
+    }
+
 }
