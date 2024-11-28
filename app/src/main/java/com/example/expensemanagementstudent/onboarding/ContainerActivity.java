@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.expensemanagementstudent.LoginActivity;
-import com.example.expensemanagementstudent.MainActivity;
 import com.example.expensemanagementstudent.R;
 import com.google.android.material.button.MaterialButton;
 
@@ -28,7 +27,7 @@ public class ContainerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_splash_main);
 
         setupOnboardingItems();
 

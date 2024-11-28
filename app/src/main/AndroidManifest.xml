@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExpenseManagementStudent"
         tools:targetApi="31">
-
+        <!-- Register AllTransactionsActivity -->
+        <activity android:name=".AllTransactionsActivity" />
         <!-- Định nghĩa SplashActivity -->
         <activity
             android:name=".MainActivity"

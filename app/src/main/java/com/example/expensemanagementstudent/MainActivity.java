@@ -5,47 +5,78 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.example.expensemanagementstudent.Fragment.AccountFragment;
+import com.example.expensemanagementstudent.Fragment.InsightFragment;
+import com.example.expensemanagementstudent.Fragment.OverviewFragment;
+import com.example.expensemanagementstudent.Fragment.ProfileFragment;
+import com.example.expensemanagementstudent.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnLogout;
+    ActivityMainBinding binding;
+
     @SuppressLint("MissingInflatedId")
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // Kiểm tra trạng thái đăng nhập
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Use View Binding to set the content view
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Check login status
         SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
 
         if (!isLoggedIn) {
-            // Nếu chưa đăng nhập, chuyển về màn hình đăng nhập
+            // If not logged in, redirect to login screen
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
             return;
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
-        btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+        // Load the default fragment (OverviewFragment)
+        loadFragment(new OverviewFragment());
+
+        // Set up Bottom Navigation
+        binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
+                int id = item.getItemId();
 
-                // Xóa trạng thái đăng nhập, nhưng không bật cờ showUsernameOnce
-                editor.remove("isLoggedIn"); // Xóa trạng thái đăng nhập
-                editor.apply();
+                if (id == R.id.overview) {
+                    selectedFragment = new OverviewFragment();
+                } else if (id == R.id.tracking) {
+                    selectedFragment = new InsightFragment();
+                } else if (id == R.id.account) {
+                    selectedFragment = new AccountFragment();
+                } else if (id == R.id.profile) {
+                    selectedFragment = new ProfileFragment();
+                }
 
-                // Chuyển về màn hình đăng nhập
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                if (selectedFragment != null) {
+                    loadFragment(selectedFragment);
+                }
+                return true;
             }
         });
+    }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
     }
 }

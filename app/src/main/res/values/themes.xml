@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.ExpenseManagementStudent" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -12,7 +12,21 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+        <item name="colorControlHighlight">@android:color/transparent</item>
+
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- Ensure icons are visible -->
     </style>
 
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorControlHighlight">@android:color/transparent</item>
+    </style>
+
+    <style name="fab_3_rounded">
+
+        <item name="cornerSize">50%</item>
+    </style>
 
 </resources>

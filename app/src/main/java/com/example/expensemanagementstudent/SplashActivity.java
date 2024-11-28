@@ -26,13 +26,9 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Intent intent;
-                if (isLoggedIn) {
-                    // Nếu đã đăng nhập, chuyển tới MainActivity
-                    intent = new Intent(SplashActivity.this, MainActivity.class);
-                } else {
-                    // Nếu chưa đăng nhập, chuyển tới ContainerActivity (onboarding)
+
                     intent = new Intent(SplashActivity.this, ContainerActivity.class);
-                }
+
                 startActivity(intent);
                 finish();
             }
