@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CEMs</string>
+    <string name="app_name">EMs</string>
     <!-- TODO: Remove or change this placeholder text -->
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

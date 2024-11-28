@@ -29,7 +29,7 @@ public class InsightFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.activity_chart, container, false);
+        return inflater.inflate(R.layout.fragment_insight, container, false);
     }
 
     @Override
@@ -64,20 +64,23 @@ public class InsightFragment extends Fragment {
         pieLegend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         pieLegend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
 
-        // BarChart setup
+        // BarChart setup for income vs expense per month
         BarChart barChart = view.findViewById(R.id.barChart);
 
         ArrayList<BarEntry> barEntries = new ArrayList<>();
-        barEntries.add(new BarEntry(0, 3000f)); // Income
-        barEntries.add(new BarEntry(1, 2500f)); // Expense
+        for (int i = 0; i < 12; i++) {
+            float income = (float) (Math.random() * 5000); // Simulating random income
+            float expense = (float) (Math.random() * 4000); // Simulating random expense
+            barEntries.add(new BarEntry(i, new float[]{income, expense}));
+        }
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "");
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Income vs Expense");
         barDataSet.setColors(new int[]{android.graphics.Color.BLUE, android.graphics.Color.RED});
         barDataSet.setValueTextSize(12f);
         barDataSet.setValueTextColor(android.graphics.Color.BLACK);
 
         BarData barData = new BarData(barDataSet);
-        barData.setBarWidth(0.5f);
+        barData.setBarWidth(0.35f);  // Adjust bar width
         barChart.setData(barData);
         barChart.getDescription().setEnabled(false);
         barChart.animateY(1000);
