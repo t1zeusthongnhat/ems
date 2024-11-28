@@ -1,66 +1,68 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.TextView;
+import androidx.fragment.app.Fragment;
 import com.example.expensemanagementstudent.R;
+import com.example.expensemanagementstudent.db.UserDB;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfileFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private TextView profileName;
+    private TextView phoneNumber;
+    private TextView emailAddress;
+    private UserDB userDB;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+                           Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        
+        // Khởi tạo views
+        profileName = view.findViewById(R.id.profileName);
+        phoneNumber = view.findViewById(R.id.phoneNumber);
+        emailAddress = view.findViewById(R.id.emailAddress);
+        
+        // Lấy thông tin user từ SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "Username");
+        
+        // Cập nhật UI
+        profileName.setText(username);
+        
+        // Khởi tạo click listeners
+        setupClickListeners(view);
+        
+        return view;
+    }
+    
+    private void setupClickListeners(View view) {
+        view.findViewById(R.id.currencySettings).setOnClickListener(v -> {
+            // Xử lý currency settings
+        });
+        
+        view.findViewById(R.id.exportRecords).setOnClickListener(v -> {
+            // Xử lý export records
+        });
+        
+        view.findViewById(R.id.backupRestore).setOnClickListener(v -> {
+            // Xử lý backup & restore
+        });
+        
+        view.findViewById(R.id.deleteReset).setOnClickListener(v -> {
+            // Xử lý delete & reset
+        });
+        
+        view.findViewById(R.id.themeSettings).setOnClickListener(v -> {
+            // Xử lý theme settings
+        });
+        
+        view.findViewById(R.id.moneyTracking).setOnClickListener(v -> {
+            // Xử lý money tracking settings
+        });
     }
 }
