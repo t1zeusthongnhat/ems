@@ -18,4 +18,10 @@
     <color name="blue_primary">#2196F3</color>
     <color name="text_secondary">#757575</color>
 
+
+    <color name="toggle_selected">#FFFFFF</color> <!-- White for selected background -->
+    <color name="toggle_unselected">#E0E0E0</color> <!-- Light gray for unselected background -->
+    <color name="toggle_text_selected">#1681FF</color> <!-- Blue for selected text -->
+    <color name="toggle_text_unselected">#757575</color> <!-- Gray for unselected text -->
+
 </resources>

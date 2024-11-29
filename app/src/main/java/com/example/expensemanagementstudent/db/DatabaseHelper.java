@@ -1,6 +1,8 @@
 package com.example.expensemanagementstudent.db;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -9,12 +11,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "ExpenseManagement.db";
     private static final int DATABASE_VERSION = 1;
 
-    // Tên bảng
+    // Table names
     public static final String USER_TABLE = "users";
     public static final String CATEGORY_TABLE = "categories";
     public static final String EXPENSE_TABLE = "expenses";
 
-    // Các cột cho bảng "users"
+    // Columns for "users" table
     public static final String USER_ID_COL = "id";
     public static final String USERNAME_COL = "username";
     public static final String EMAIL_COL = "email";
@@ -24,12 +26,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CREATED_COL = "created_at";
     public static final String UPDATED_COL = "updated_at";
 
-    // Các cột cho bảng "categories"
-    public static final String CATEGORY_ID_COL = "_id"; // ID column for CursorAdapter
+    // Columns for "categories" table
+    public static final String CATEGORY_ID_COL = "_id";
     public static final String CATEGORY_NAME_COL = "name";
     public static final String CATEGORY_ICON_COL = "icon";
 
-    // Các cột cho bảng "expenses"
+    // Columns for "expenses" table
     public static final String EXPENSE_ID_COL = "id";
     public static final String TYPE_COL = "type"; // 1: income, 0: expense
     public static final String AMOUNT_COL = "amount";
@@ -44,7 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Tạo bảng "users"
+        // Create "users" table
         String createUserTable = "CREATE TABLE " + USER_TABLE + " (" +
                 USER_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 USERNAME_COL + " TEXT NOT NULL, " +
@@ -56,17 +58,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 UPDATED_COL + " TEXT DEFAULT CURRENT_TIMESTAMP);";
         db.execSQL(createUserTable);
 
-        // Tạo bảng "categories"
+        // Create "categories" table
         String createCategoryTable = "CREATE TABLE " + CATEGORY_TABLE + " (" +
                 CATEGORY_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CATEGORY_NAME_COL + " TEXT NOT NULL, " +
                 CATEGORY_ICON_COL + " TEXT NOT NULL);";
         db.execSQL(createCategoryTable);
 
-        // Tạo bảng "expenses"
+        // Create "expenses" table
         String createExpenseTable = "CREATE TABLE " + EXPENSE_TABLE + " (" +
                 EXPENSE_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TYPE_COL + " INTEGER NOT NULL, " + // 1: income, 0: expense
+                TYPE_COL + " INTEGER NOT NULL, " +
                 AMOUNT_COL + " REAL NOT NULL, " +
                 DESCRIPTION_COL + " TEXT, " +
                 DATE_COL + " TEXT NOT NULL, " +
@@ -83,5 +85,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + CATEGORY_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + EXPENSE_TABLE);
         onCreate(db);
+    }
+
+    // Add a new transaction (income or expense)
+    public long addTransaction(int type, double amount, String description, String date, int userId, int categoryId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TYPE_COL, type);
+        values.put(AMOUNT_COL, amount);
+        values.put(DESCRIPTION_COL, description);
+        values.put(DATE_COL, date);
+        values.put(EXPENSE_USER_ID_COL, userId);
+        values.put(EXPENSE_CATEGORY_ID_COL, categoryId);
+        return db.insert(EXPENSE_TABLE, null, values);
+    }
+
+    // Update a transaction
+    public int updateTransaction(int id, int type, double amount, String description, String date, int userId, int categoryId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TYPE_COL, type);
+        values.put(AMOUNT_COL, amount);
+        values.put(DESCRIPTION_COL, description);
+        values.put(DATE_COL, date);
+        values.put(EXPENSE_USER_ID_COL, userId);
+        values.put(EXPENSE_CATEGORY_ID_COL, categoryId);
+        return db.update(EXPENSE_TABLE, values, EXPENSE_ID_COL + "=?", new String[]{String.valueOf(id)});
+    }
+
+    // Delete a transaction
+    public int deleteTransaction(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(EXPENSE_TABLE, EXPENSE_ID_COL + "=?", new String[]{String.valueOf(id)});
+    }
+
+    // Retrieve all transactions
+    public Cursor getAllTransactions() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + EXPENSE_TABLE + " ORDER BY " + DATE_COL + " DESC", null);
+    }
+
+    // Retrieve transactions by type (1 for income, 0 for expense)
+    public Cursor getTransactionsByType(int type) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + EXPENSE_TABLE + " WHERE " + TYPE_COL + "=? ORDER BY " + DATE_COL + " DESC", new String[]{String.valueOf(type)});
+    }
+
+    // Retrieve total income or expense
+    public double getTotalByType(int type) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(" + AMOUNT_COL + ") FROM " + EXPENSE_TABLE + " WHERE " + TYPE_COL + "=?", new String[]{String.valueOf(type)});
+        if (cursor.moveToFirst()) {
+            return cursor.getDouble(0);
+        }
+        cursor.close();
+        return 0;
     }
 }
