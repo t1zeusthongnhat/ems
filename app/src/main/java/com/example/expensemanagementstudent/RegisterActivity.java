@@ -14,16 +14,12 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.example.expensemanagementstudent.db.UserDB;
 
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
 
 public class RegisterActivity extends AppCompatActivity {
     TextView tvRegister;
