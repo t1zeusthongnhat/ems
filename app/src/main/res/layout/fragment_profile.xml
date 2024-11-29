@@ -10,16 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@color/white">
+        android:padding="24dp"
+        android:background="@color/primary_color">
 
         <ImageView
             android:id="@+id/profileImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_profile_placeholder"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/profileName"
@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Username"
-            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:textSize="24sp"
             android:textStyle="bold"/>
 
         <!-- Phone Number -->
@@ -36,13 +37,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="16dp">
 
             <TextView
                 android:id="@+id/phoneNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add Phone Number"
+                android:textColor="@color/white"
+                android:alpha="0.9"
                 android:drawablePadding="8dp"/>
         </LinearLayout>
 
@@ -69,6 +72,9 @@
         android:layout_height="wrap_content"
         android:text="Management"
         android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:background="@color/background_light"
         android:padding="16dp"/>
 
     <LinearLayout
@@ -82,6 +88,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Currency sign"
+            android:textColor="@color/text_primary"
+            android:background="?attr/selectableItemBackground"
             android:padding="16dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
 
