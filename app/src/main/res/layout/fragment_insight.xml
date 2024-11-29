@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -5,12 +6,54 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+=======
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#ffffff"
+    android:layout_marginBottom="20dp">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
+
+<!-- CardView chứa biểu đồ PieChart và Category Overview -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_rounded_card"
+    android:layout_marginBottom="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Expense Distribution by Category"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center" />
+
+    <!-- PieChart -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Category Overview -->
+>>>>>>> 4e44c76ec0eeaa5731afe7e9771a14a2e7e659a6
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="8dp"
+        android:background="@drawable/bg_rounded_card">
 
+<<<<<<< HEAD
         <!-- Filter Buttons -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/filterChipGroup"
@@ -117,6 +160,99 @@
                     android:layout_height="300dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+=======
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category Overview"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp" />
 
+        <!-- Category items with cost -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="@drawable/bg_rounded_card">
+
+            <!-- Left side: Category name -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Food"
+                android:textColor="#000000"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Right side: Expense cost -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$50"
+                android:textColor="#000000"
+                android:layout_marginBottom="4dp" />
+        </LinearLayout>
+
+        <!-- Repeat for other categories like Shopping, Travelling, etc. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="@drawable/bg_rounded_card">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Shopping"
+                android:textColor="#000000"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$30"
+                android:textColor="#000000"
+                android:layout_marginBottom="4dp" />
+        </LinearLayout>
+>>>>>>> 4e44c76ec0eeaa5731afe7e9771a14a2e7e659a6
+
+        <!-- Add more categories here -->
     </LinearLayout>
+<<<<<<< HEAD
 </ScrollView>
+=======
+</LinearLayout>
+
+<!-- CardView chứa biểu đồ BarChart cho Income vs Expense -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_rounded_card"
+    android:layout_marginBottom="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Income vs Expense (per Month)"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center" />
+
+    <!-- BarChart -->
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginBottom="16dp" />
+</LinearLayout>
+</LinearLayout>
+    </ScrollView>
+>>>>>>> 4e44c76ec0eeaa5731afe7e9771a14a2e7e659a6

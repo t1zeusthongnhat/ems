@@ -3,6 +3,7 @@ package com.example.expensemanagementstudent;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,16 +14,12 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.example.expensemanagementstudent.db.UserDB;
 
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
 
 public class RegisterActivity extends AppCompatActivity {
     TextView tvRegister;
@@ -72,37 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         });
     }
-    private void signupWithDataFile(){
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String username = edtUsername.getText().toString().trim();
-                String password = edtPassword.getText().toString().trim();
 
-                if(TextUtils.isEmpty(username)) {
-                    edtUsername.setError("Username can be not empty");
-                    return;
-                }     if(TextUtils.isEmpty(password)) {
-                    edtPassword.setError("Password can be not empty");
-                    return;
-                }
-                FileOutputStream fileOutputStream = null;
-                try {
-                    username = username + "|";
-                    fileOutputStream = openFileOutput("account.txt", Context.MODE_APPEND);
-                    fileOutputStream.write(username.getBytes(StandardCharsets.UTF_8));
-                    fileOutputStream.write(password.getBytes(StandardCharsets.UTF_8));
-                    fileOutputStream.write('\n');
-                    fileOutputStream.close();
-                    edtUsername.setText("");
-                    edtPassword.setText("");
-                    Toast.makeText(RegisterActivity.this, "Succesfully", Toast.LENGTH_SHORT).show();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-            }
-        });
-    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void singupWithSQLite() {
         String user = edtUsername.getText().toString().trim();
@@ -110,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = edtEmail.getText().toString().trim();
         String address = edtAddress.getText().toString().trim();
 
-        // Lấy RadioGroup và kiểm tra tùy chọn được chọn
+        // Get selected gender from RadioGroup
         RadioGroup radioGroupGender = findViewById(R.id.radioGroupGender);
         int selectedGenderId = radioGroupGender.getCheckedRadioButtonId();
         String gender = "";
@@ -121,25 +88,34 @@ public class RegisterActivity extends AppCompatActivity {
             gender = "Female";
         }
 
-        // Kiểm tra các trường dữ liệu
+        // Validate input fields
         if (TextUtils.isEmpty(user) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(email) ||
                 TextUtils.isEmpty(gender) || TextUtils.isEmpty(address)) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Thêm dữ liệu vào SQLite
+        // Add user data to SQLite
         long insert = userDB.addNewAccountUser(user, pass, email, gender, address);
         if (insert == -1) {
             Toast.makeText(this, "Register failed", Toast.LENGTH_SHORT).show();
         } else {
+            // Save user info in SharedPreferences after successful registration
+            SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("username", user);
+            editor.putString("email", email);  // Optional: Store more info like email
+            editor.putBoolean("isLoggedIn", true); // Mark as logged in
+            editor.apply();
+
             Toast.makeText(this, "Register successfully", Toast.LENGTH_SHORT).show();
         }
 
-        // Chuyển đến màn hình đăng nhập
+        // Redirect to login screen
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(intent);
     }
+
 
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
