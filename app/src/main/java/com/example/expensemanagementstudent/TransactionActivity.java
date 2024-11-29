@@ -43,8 +43,24 @@ public class TransactionActivity extends AppCompatActivity {
         });
 
         TextInputEditText inputAmount = findViewById(R.id.input_amount);
-        TextInputLayout inputAmountLayout = findViewById(R.id.input_amount_layout);
+        // Initialize the views
+        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.transaction_type_toggle);
+        Button btnSubmit = findViewById(R.id.btn_submit);
 
+        // Set default selected to "Expense" and update the button text
+        toggleGroup.check(R.id.btn_expense);
+        btnSubmit.setText("Add Expense");
+
+        // Add listener for toggle group to update button text
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                if (checkedId == R.id.btn_expense) {
+                    btnSubmit.setText("Add Expense");
+                } else if (checkedId == R.id.btn_income) {
+                    btnSubmit.setText("Add Income");
+                }
+            }
+        });
         // Add TextWatcher to append "$" at the end
         inputAmount.addTextChangedListener(new TextWatcher() {
             private String current = "";
@@ -75,11 +91,9 @@ public class TransactionActivity extends AppCompatActivity {
         });
 
         // Other initialization code
-        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.transaction_type_toggle);
         Spinner categorySpinner = findViewById(R.id.category_spinner);
         EditText inputDate = findViewById(R.id.input_date);
         EditText inputNotes = findViewById(R.id.input_notes);
-        Button btnSubmit = findViewById(R.id.btn_submit);
 
         // Set default date to today
         Calendar calendar = Calendar.getInstance();

@@ -159,7 +159,7 @@
                     android:layout_height="59dp"
                     android:layout_marginTop="20dp"
                     android:backgroundTint="@color/button_main"
-                    android:text="Save transaction"
+                    android:text="Add transaction"
                     android:textColor="@color/white" />
             </LinearLayout>
         </ScrollView>
