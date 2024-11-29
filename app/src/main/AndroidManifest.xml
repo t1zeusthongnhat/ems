@@ -22,6 +22,7 @@
             android:name=".ChartActivity"
             android:exported="true" />
         <activity android:name=".LoginActivity" android:exported="true"/>
+        <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".onboarding.ContainerActivity" android:exported="true" />
         <activity android:name=".AddExpenseActivity" android:exported="false"/>

@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
                     intent = new Intent(SplashActivity.this, MainActivity.class);
                 } else {
                     // Nếu chưa đăng nhập, chuyển tới màn hình đăng nhập
-                    intent = new Intent(SplashActivity.this, LoginActivity.class);
+                    intent = new Intent(SplashActivity.this, ContainerActivity.class);
                 }
 
                 startActivity(intent);
