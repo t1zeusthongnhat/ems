@@ -19,10 +19,12 @@ import com.example.expensemanagementstudent.Fragment.InsightFragment;
 import com.example.expensemanagementstudent.Fragment.OverviewFragment;
 import com.example.expensemanagementstudent.Fragment.ProfileFragment;
 import com.example.expensemanagementstudent.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
+    FloatingActionButton addEx;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -32,6 +34,14 @@ public class MainActivity extends AppCompatActivity {
         // Use View Binding to set the content view
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        addEx = findViewById(R.id.fab_add_transaction);
+        addEx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent( MainActivity.this, AddExpenseActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Check login status
         SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);

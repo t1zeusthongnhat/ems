@@ -1,6 +1,8 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -73,9 +75,17 @@ public class OverviewFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
 
+        // Find the greeting TextView
+        TextView greetingText = rootView.findViewById(R.id.greetingText);
         // Find the "See All" button
         TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
 
+        // Retrieve the username from SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "Username"); // Default is "Username" if not found
+
+        // Set the greeting text with the username
+        greetingText.setText("Hi " + username + ",");
 
         // Initialize views
         monthYearDisplay = rootView.findViewById(R.id.month_year_display);
@@ -103,6 +113,7 @@ public class OverviewFragment extends Fragment {
                 updateMonthYearDisplay();
             }
         });
+
         // Set click listener for "See All" button
         seeAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +125,7 @@ public class OverviewFragment extends Fragment {
 
         return rootView;
     }
+
     private void updateMonthYearDisplay() {
         // Format and display the month and year
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.getDefault());
