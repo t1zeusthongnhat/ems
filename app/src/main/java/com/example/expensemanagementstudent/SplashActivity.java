@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expensemanagementstudent.onboarding.ContainerActivity;
@@ -27,7 +28,13 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 Intent intent;
 
-                    intent = new Intent(SplashActivity.this, ContainerActivity.class);
+                if (isLoggedIn) {
+                    // Nếu đã đăng nhập, chuyển tới màn hình chính
+                    intent = new Intent(SplashActivity.this, MainActivity.class);
+                } else {
+                    // Nếu chưa đăng nhập, chuyển tới màn hình đăng nhập
+                    intent = new Intent(SplashActivity.this, LoginActivity.class);
+                }
 
                 startActivity(intent);
                 finish();

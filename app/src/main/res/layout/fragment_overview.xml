@@ -35,6 +35,7 @@
 
                 <!-- Greeting Text -->
                 <TextView
+                    android:id="@+id/greetingText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hi QuanVip,"
@@ -51,6 +52,7 @@
                     android:textColor="#1681FF"
                     android:textSize="14sp" />
             </LinearLayout>
+
 
             <!-- Notification Icon -->
             <ImageView

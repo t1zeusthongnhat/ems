@@ -1,13 +1,18 @@
 package com.example.expensemanagementstudent.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
+
+import com.example.expensemanagementstudent.LoginActivity;
 import com.example.expensemanagementstudent.R;
 import com.example.expensemanagementstudent.db.UserDB;
 
@@ -15,54 +20,48 @@ public class ProfileFragment extends Fragment {
     private TextView profileName;
     private TextView phoneNumber;
     private TextView emailAddress;
+    private Button logoutButton;
     private UserDB userDB;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        
-        // Khởi tạo views
+
+        // Initialize views
         profileName = view.findViewById(R.id.profileName);
         phoneNumber = view.findViewById(R.id.phoneNumber);
         emailAddress = view.findViewById(R.id.emailAddress);
-        
-        // Lấy thông tin user từ SharedPreferences
+        logoutButton = view.findViewById(R.id.logoutButton);
+
+        // Retrieve user information from SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "Username");
-        
-        // Cập nhật UI
+        String email = sharedPreferences.getString("email", "Not Provided");
+
+        // Update the UI
         profileName.setText(username);
-        
-        // Khởi tạo click listeners
-        setupClickListeners(view);
-        
+        emailAddress.setText(email);  // Set email or other details
+
+        // Setup logout click listener
+        logoutButton.setOnClickListener(v -> logout());
+
         return view;
     }
-    
-    private void setupClickListeners(View view) {
-        view.findViewById(R.id.currencySettings).setOnClickListener(v -> {
-            // Xử lý currency settings
-        });
-        
-        view.findViewById(R.id.exportRecords).setOnClickListener(v -> {
-            // Xử lý export records
-        });
-        
-        view.findViewById(R.id.backupRestore).setOnClickListener(v -> {
-            // Xử lý backup & restore
-        });
-        
-        view.findViewById(R.id.deleteReset).setOnClickListener(v -> {
-            // Xử lý delete & reset
-        });
-        
-        view.findViewById(R.id.themeSettings).setOnClickListener(v -> {
-            // Xử lý theme settings
-        });
-        
-        view.findViewById(R.id.moneyTracking).setOnClickListener(v -> {
-            // Xử lý money tracking settings
-        });
+
+
+    private void logout() {
+        // Clear login state in SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLoggedIn", false);
+        editor.putString("username", "");  // Clear username and other info
+        editor.apply();
+
+        // Redirect to LoginActivity
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
+        getActivity().finish();  // Close the current activity
     }
+
 }
