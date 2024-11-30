@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         addEx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent( MainActivity.this, AddExpenseActivity.class);
+                Intent intent = new Intent( MainActivity.this, TransactionActivity.class);
                 startActivity(intent);
             }
         });

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
-        android:background="@color/white">
+        android:background="@drawable/top_gradient">
 
         <ImageView
             android:id="@+id/profileImage"
@@ -19,6 +19,7 @@
             android:layout_height="80dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_profile_placeholder"
+            android:background="@drawable/circle_background"
             android:layout_marginBottom="10dp"/>
 
         <TextView
@@ -27,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Username"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"/>
 
@@ -69,7 +71,7 @@
         android:layout_height="wrap_content"
         android:text="Management"
         android:textStyle="bold"
-        android:padding="16dp"/>
+        android:padding="15dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -82,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Currency sign"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
 
         <TextView
@@ -90,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Export records"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
 
         <TextView
@@ -98,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Backup &amp; Restore"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
 
         <TextView
@@ -106,7 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Delete &amp; Reset"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
     </LinearLayout>
 
@@ -116,7 +118,7 @@
         android:layout_height="wrap_content"
         android:text="General"
         android:textStyle="bold"
-        android:padding="16dp"/>
+        android:padding="15dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -129,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Theme"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
 
         <TextView
@@ -137,7 +139,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Like Money tracking"
-            android:padding="16dp"
+            android:padding="15dp"
             android:drawableEnd="@drawable/ic_arrow_right"/>
     </LinearLayout>
 
@@ -146,7 +148,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="20dp">
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="300dp"
