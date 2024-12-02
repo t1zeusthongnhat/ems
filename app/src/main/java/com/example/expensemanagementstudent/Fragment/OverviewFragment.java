@@ -114,8 +114,10 @@ public class OverviewFragment extends Fragment {
     }
 
     private void updateMonthYearDisplay() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.getDefault());
+        // Force the locale to English
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.ENGLISH);
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
     }
+
 }
