@@ -8,6 +8,8 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -16,12 +18,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.expensemanagementstudent.db.CategoryDB;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TransactionActivity extends AppCompatActivity {
@@ -80,7 +84,7 @@ public class TransactionActivity extends AppCompatActivity {
 
                     String input = s.toString().replace("$", "").trim(); // Remove "$" to avoid duplication
                     if (!input.isEmpty()) {
-                        current = input + " $"; // Append "$" at the end
+                        current = input + "$"; // Append "$" at the end
                         inputAmount.setText(current);
                         inputAmount.setSelection(input.length()); // Set cursor position before "$"
                     }
@@ -88,10 +92,41 @@ public class TransactionActivity extends AppCompatActivity {
                     inputAmount.addTextChangedListener(this);
                 }
             }
+
         });
 
-        // Other initialization code
+        /**
+         * Get category from database in add transaction.
+         */
         Spinner categorySpinner = findViewById(R.id.category_spinner);
+        CategoryDB categoryDB = new CategoryDB(this);
+
+        // Fetch category names from the database
+        ArrayList<String> categoryNames = categoryDB.getCategoryNames();
+        // Set up the ArrayAdapter
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item, // Layout for the dropdown items
+                categoryNames
+        );
+
+
+
+
+        // Set the dropdown layout style
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Attach the adapter to the Spinner
+        categorySpinner.setAdapter(adapter);
+
+
+        // Set the dropdown layout style
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Attach the adapter to the Spinner
+        categorySpinner.setAdapter(adapter);
+
+        // Other initialization code
         EditText inputDate = findViewById(R.id.input_date);
         EditText inputNotes = findViewById(R.id.input_notes);
 
@@ -143,26 +178,31 @@ public class TransactionActivity extends AppCompatActivity {
 
         btnSubmit.setOnClickListener(v -> {
             // Validate amount input
-            if (inputAmount.getText().toString().isEmpty()) {
+            String amountText = inputAmount.getText().toString().replace("$", "").trim(); // Remove "$" and trim spaces
+            if (amountText.isEmpty()) {
                 Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double amount = Double.parseDouble(inputAmount.getText().toString());
-            String category = categorySpinner.getSelectedItem().toString();
-            String date = inputDate.getText().toString();
-            String notes = inputNotes.getText().toString();
+            try {
+                double amount = Double.parseDouble(amountText); // Safely parse the cleaned input
+                String category = categorySpinner.getSelectedItem().toString();
+                String date = inputDate.getText().toString();
+                String notes = inputNotes.getText().toString();
 
-            // Determine if it's Income or Expense
-            int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 1 : 0;
+                // Determine if it's Income or Expense
+                int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 1 : 0;
 
-            // Save to the database
-            long transactionId = dbHelper.addTransaction(type, amount, notes, date, 1, getCategoryId(category)); // Assuming user ID is 1 for now
-            if (transactionId != -1) {
-                Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show();
-                finish(); // Close the activity after saving
-            } else {
-                Toast.makeText(this, "Error saving transaction", Toast.LENGTH_SHORT).show();
+                // Save to the database
+                long transactionId = dbHelper.addTransaction(type, amount, notes, date, 1, getCategoryId(category)); // Assuming user ID is 1 for now
+                if (transactionId != -1) {
+                    Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show();
+                    finish(); // Close the activity after saving
+                } else {
+                    Toast.makeText(this, "Error saving transaction", Toast.LENGTH_SHORT).show();
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid amount entered", Toast.LENGTH_SHORT).show(); // Handle invalid input
             }
         });
     }
@@ -185,7 +225,7 @@ public class TransactionActivity extends AppCompatActivity {
 
     // Helper method to format the date
     private String formatDate(Calendar calendar) {
-        return android.text.format.DateFormat.format("yyyy-MM-dd", calendar).toString();
+        return android.text.format.DateFormat.format("dd-MM-yyyy", calendar).toString();
     }
 
     // Dummy method to get category ID from name

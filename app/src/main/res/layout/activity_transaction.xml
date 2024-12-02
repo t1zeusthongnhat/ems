@@ -6,7 +6,7 @@
     <!-- Gradient background at the top -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="290dp"
+        android:layout_height="890dp"
         android:background="@drawable/top_gradient" />
 
     <!-- Main content -->
@@ -46,7 +46,7 @@
         <!-- Rest of the form -->
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="635dp"
             android:background="@drawable/circle_background"
             android:padding="16dp">
 
@@ -60,10 +60,10 @@
                     android:id="@+id/transaction_type_toggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_margin="16dp"
-                    app:singleSelection="true"
                     app:selectionRequired="true"
-                    android:layout_gravity="center_horizontal">
+                    app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_expense"
@@ -94,36 +94,51 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/input_background"
-                app:hintEnabled="true"
-                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="68dp"
-                    android:hint="Amount"
-                    android:imeOptions="actionDone"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:background="@drawable/edittext_background_selector" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="68dp"
+                        android:background="@drawable/edittext_background_selector"
+                        android:hint="Amount"
+                        android:imeOptions="actionDone"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
 
-
-        <Spinner
-                    android:id="@+id/category_spinner"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_category_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/input_background"
+                    app:hintEnabled="true">
+
+                    <Spinner
+                        android:id="@+id/category_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:background="@drawable/edittext_background_selector"
+                        android:padding="16dp"
+                        android:spinnerMode="dropdown" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintEnabled="true"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/input_date"
@@ -139,18 +154,19 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintEnabled="true"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/input_notes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/edittext_background_selector"
                         android:hint="Description"
-                        android:textSize="20sp"
-                        android:background="@drawable/edittext_background_selector" />
+                        android:textSize="20sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Button
