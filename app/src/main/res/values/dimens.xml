@@ -1,0 +1,4 @@
+<resources>
+    <!-- Other dimensions -->
+    <dimen name="popup_height">100dp</dimen> <!-- Adjust this value as necessary -->
+</resources>
