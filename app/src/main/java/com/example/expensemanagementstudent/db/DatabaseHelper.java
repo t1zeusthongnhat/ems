@@ -9,12 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ExpenseManagement.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2; // Incremented version to trigger onUpgrade
 
     // Table names
     public static final String USER_TABLE = "users";
     public static final String CATEGORY_TABLE = "categories";
     public static final String EXPENSE_TABLE = "expenses";
+    public static final String BUDGET_TABLE = "budgets";
 
     // Columns for "users" table
     public static final String USER_ID_COL = "id";
@@ -30,10 +31,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CATEGORY_ID_COL = "_id";
     public static final String CATEGORY_NAME_COL = "name";
     public static final String CATEGORY_ICON_COL = "icon";
+    public static final String CATEGORY_TYPE_COL = "type"; // 0 for income, 1 for expense
+
+    // Columns for "budgets" table
+    public static final String BUDGET_ID_COL = "id";
+    public static final String BUDGET_AMOUNT_COL = "amount";
+    public static final String BUDGET_TYPE_COL = "type"; // 0: income, 1: expense
+    public static final String BUDGET_CATEGORY_ID_COL = "category_id";
 
     // Columns for "expenses" table
     public static final String EXPENSE_ID_COL = "id";
-    public static final String TYPE_COL = "type"; // 1: income, 0: expense
+    public static final String TYPE_COL = "type"; // 0: income, 1: expense
     public static final String AMOUNT_COL = "amount";
     public static final String DESCRIPTION_COL = "description";
     public static final String DATE_COL = "date";
@@ -62,7 +70,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createCategoryTable = "CREATE TABLE " + CATEGORY_TABLE + " (" +
                 CATEGORY_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CATEGORY_NAME_COL + " TEXT NOT NULL, " +
-                CATEGORY_ICON_COL + " TEXT NOT NULL);";
+                CATEGORY_ICON_COL + " TEXT NOT NULL, " +
+                CATEGORY_TYPE_COL + " INTEGER NOT NULL DEFAULT 1);"; // 1: expense (default), 0: income
         db.execSQL(createCategoryTable);
 
         // Create "expenses" table
@@ -77,68 +86,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + EXPENSE_USER_ID_COL + ") REFERENCES " + USER_TABLE + "(" + USER_ID_COL + "), " +
                 "FOREIGN KEY(" + EXPENSE_CATEGORY_ID_COL + ") REFERENCES " + CATEGORY_TABLE + "(" + CATEGORY_ID_COL + "));";
         db.execSQL(createExpenseTable);
+
+        // Create budgets table
+        String createBudgetTable = "CREATE TABLE " + BUDGET_TABLE + " (" +
+                BUDGET_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                BUDGET_AMOUNT_COL + " REAL NOT NULL, " +
+                BUDGET_TYPE_COL + " INTEGER NOT NULL, " +
+                BUDGET_CATEGORY_ID_COL + " INTEGER, " +
+                "FOREIGN KEY(" + BUDGET_CATEGORY_ID_COL + ") REFERENCES " + CATEGORY_TABLE + "(" + CATEGORY_ID_COL + "));";
+        db.execSQL(createBudgetTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + CATEGORY_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + EXPENSE_TABLE);
-        onCreate(db);
-    }
+        if (oldVersion < 2) {
 
-    // Add a new transaction (income or expense)
-    public long addTransaction(int type, double amount, String description, String date, int userId, int categoryId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TYPE_COL, type);
-        values.put(AMOUNT_COL, amount);
-        values.put(DESCRIPTION_COL, description);
-        values.put(DATE_COL, date);
-        values.put(EXPENSE_USER_ID_COL, userId);
-        values.put(EXPENSE_CATEGORY_ID_COL, categoryId);
-        return db.insert(EXPENSE_TABLE, null, values);
-    }
+            // Đổi tên bảng cũ
+            db.execSQL("ALTER TABLE " + CATEGORY_TABLE + " RENAME TO " + CATEGORY_TABLE + "_old;");
 
-    // Update a transaction
-    public int updateTransaction(int id, int type, double amount, String description, String date, int userId, int categoryId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TYPE_COL, type);
-        values.put(AMOUNT_COL, amount);
-        values.put(DESCRIPTION_COL, description);
-        values.put(DATE_COL, date);
-        values.put(EXPENSE_USER_ID_COL, userId);
-        values.put(EXPENSE_CATEGORY_ID_COL, categoryId);
-        return db.update(EXPENSE_TABLE, values, EXPENSE_ID_COL + "=?", new String[]{String.valueOf(id)});
-    }
+            // Tạo bảng mới
+            String createCategoryTable = "CREATE TABLE " + CATEGORY_TABLE + " (" +
+                    CATEGORY_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    CATEGORY_NAME_COL + " TEXT NOT NULL, " +
+                    CATEGORY_ICON_COL + " TEXT NOT NULL, " +
+                    CATEGORY_TYPE_COL + " INTEGER NOT NULL DEFAULT 1);"; // 1: expense (default), 0: income
+            db.execSQL(createCategoryTable);
 
-    // Delete a transaction
-    public int deleteTransaction(int id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(EXPENSE_TABLE, EXPENSE_ID_COL + "=?", new String[]{String.valueOf(id)});
-    }
+            // Di chuyển dữ liệu từ bảng cũ sang bảng mới
+            String migrateData = "INSERT INTO " + CATEGORY_TABLE + " (" +
+                    CATEGORY_ID_COL + ", " +
+                    CATEGORY_NAME_COL + ", " +
+                    CATEGORY_ICON_COL + ", " +
+                    CATEGORY_TYPE_COL + ") " +
+                    "SELECT " +
+                    CATEGORY_ID_COL + ", " +
+                    CATEGORY_NAME_COL + ", " +
+                    CATEGORY_ICON_COL + ", " +
+                    "1 " + // Mặc định tất cả là "expense" nếu không có cột `is_income`
+                    "FROM " + CATEGORY_TABLE + "_old;";
+            db.execSQL(migrateData);
 
-    // Retrieve all transactions
-    public Cursor getAllTransactions() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + EXPENSE_TABLE + " ORDER BY " + DATE_COL + " DESC", null);
-    }
-
-    // Retrieve transactions by type (1 for income, 0 for expense)
-    public Cursor getTransactionsByType(int type) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + EXPENSE_TABLE + " WHERE " + TYPE_COL + "=? ORDER BY " + DATE_COL + " DESC", new String[]{String.valueOf(type)});
-    }
-
-    // Retrieve total income or expense
-    public double getTotalByType(int type) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT SUM(" + AMOUNT_COL + ") FROM " + EXPENSE_TABLE + " WHERE " + TYPE_COL + "=?", new String[]{String.valueOf(type)});
-        if (cursor.moveToFirst()) {
-            return cursor.getDouble(0);
+            // Xóa bảng cũ
+            db.execSQL("DROP TABLE " + CATEGORY_TABLE + "_old;");
         }
-        cursor.close();
-        return 0;
     }
+
+
+
+
+
 }

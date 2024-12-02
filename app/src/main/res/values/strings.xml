@@ -19,4 +19,13 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Other string resources -->
+    <string name="category_icon">Category Icon</string>
+
+        <string-array name="category_type_array">
+            <item>Income</item>
+            <item>Expense</item>
+        </string-array>
+
+
 </resources>

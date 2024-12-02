@@ -1,5 +1,6 @@
 package com.example.expensemanagementstudent.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +15,30 @@ public class UserDB {
         db = helper.getWritableDatabase();
     }
 
+
+    // Method to get userId by username
+    @SuppressLint("Range")
+    public int getUserId(String username) {
+        int userId = -1; // Default value if user not found
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(DatabaseHelper.USER_TABLE,
+                    new String[]{DatabaseHelper.USER_ID_COL}, // Column to retrieve
+                    DatabaseHelper.USERNAME_COL + " = ?",
+                    new String[]{username},
+                    null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                userId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.USER_ID_COL));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Ensure cursor is closed to avoid memory leaks
+            }
+        }
+        return userId;
+    }
     // Thêm người dùng mới
     public long addNewAccountUser(String username, String password, String email, String gender, String address) {
         ContentValues values = new ContentValues();

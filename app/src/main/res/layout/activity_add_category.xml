@@ -33,6 +33,13 @@
             android:inputType="text"
             android:padding="8dp"
             android:layout_marginBottom="8dp" />
+        <Spinner
+            android:id="@+id/spCategoryType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="8dp"
+            android:entries="@array/category_type_array" />
 
         <EditText
             android:id="@+id/etCategoryIcon"
@@ -54,6 +61,7 @@
             android:verticalSpacing="8dp"
             android:horizontalSpacing="8dp"
             android:visibility="gone" />
+
 
         <Button
             android:id="@+id/btnAddCate"

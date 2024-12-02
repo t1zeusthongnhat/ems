@@ -13,7 +13,12 @@
         android:inputType="text"
         android:padding="8dp"
         android:layout_marginBottom="8dp" />
-
+    <Spinner
+        android:id="@+id/spUpdateCategoryType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:entries="@array/category_type_array" />
     <EditText
         android:id="@+id/etUpdateCategoryIcon"
         android:layout_width="match_parent"

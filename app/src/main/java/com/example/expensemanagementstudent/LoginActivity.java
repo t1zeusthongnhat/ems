@@ -82,10 +82,14 @@ public class LoginActivity extends AppCompatActivity {
 
                         case "LOGIN_SUCCESS":
                             Toast.makeText(LoginActivity.this, "Login successful.", Toast.LENGTH_SHORT).show();
+                            // Lấy userId từ database
+                            int userId = userDB.getUserId(username);
+
                             // Lưu trạng thái đăng nhập
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putBoolean("isLoggedIn", true);
                             editor.putString("username", username);
+                            editor.putInt("userId", userId); // Lưu userId vào SharedPreferences
                             editor.putBoolean("showUsernameOnce", true); // Đặt cờ để hiển thị username 1 lần
                             editor.apply();
 
