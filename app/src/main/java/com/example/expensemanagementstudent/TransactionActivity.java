@@ -1,9 +1,7 @@
 package com.example.expensemanagementstudent;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.expensemanagementstudent.db.CategoryDB;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
 import com.example.expensemanagementstudent.db.ExpenseDB;
-import com.example.expensemanagementstudent.model.ExpenseViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -39,7 +36,7 @@ public class TransactionActivity extends AppCompatActivity {
     private Spinner categorySpinner;
     private ArrayAdapter<String> adapter;
     private MaterialButton btnExpense, btnIncome;
-    ExpenseViewModel expenseViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
