@@ -1,0 +1,5 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#805B5A5A" /> <!-- 80 is the alpha value -->
+    <size android:width="64dp" android:height="64dp" />
+    <corners android:radius="32dp" />
+</shape>
