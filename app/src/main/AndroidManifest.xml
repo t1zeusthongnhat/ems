@@ -25,7 +25,10 @@
         <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".onboarding.ContainerActivity" android:exported="true" />
-        <activity android:name=".TransactionActivity" android:exported="false"/>
+        <activity
+            android:name=".TransactionActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
         <!-- Định nghĩa MainActivity -->
         <activity

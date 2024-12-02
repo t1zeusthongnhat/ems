@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,62 @@ public class TransactionActivity extends AppCompatActivity {
                 } else if (checkedId == R.id.btn_income) {
                     btnSubmit.setText("Add Income");
                 }
+            }
+        });
+        TextView amountErrorMessage = findViewById(R.id.amount_error_message);
+
+        // Add TextWatcher to validate the amount
+        inputAmount.addTextChangedListener(new TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals(current)) {
+                    inputAmount.removeTextChangedListener(this);
+
+                    String input = s.toString().replace(".", "").replace("$", "").trim(); // Remove formatting
+                    if (!input.isEmpty()) {
+                        try {
+                            long amount = Long.parseLong(input);
+                            if (amount > 1_000_000_000) {
+                                // Show error
+                                amountErrorMessage.setText("Maximum amount is 999.999.999.");
+                                amountErrorMessage.setVisibility(View.VISIBLE);
+
+                                /*// Set the text color and underline the input layout
+                                ((TextInputLayout) inputAmount.getParent().getParent()).setErrorEnabled(true);
+                                ((TextInputLayout) inputAmount.getParent().getParent()).setError("Invalid Amount");*/
+
+                            } else {
+                                // Hide error if amount is valid
+                                amountErrorMessage.setVisibility(View.GONE);
+                                ((TextInputLayout) inputAmount.getParent().getParent()).setErrorEnabled(false);
+                            }
+                            current = formatAmount(amount) + " $"; // Format the input
+                            inputAmount.setText(current);
+                            inputAmount.setSelection(current.length() - 2); // Set cursor before "$"
+                        } catch (NumberFormatException e) {
+                            amountErrorMessage.setVisibility(View.GONE);
+                        }
+                    } else {
+                        amountErrorMessage.setVisibility(View.GONE);
+                    }
+
+                    inputAmount.addTextChangedListener(this);
+                }
+            }
+
+            // Helper method to format the amount
+            private String formatAmount(long amount) {
+                return String.format("%,d", amount).replace(",", ".");
             }
         });
         // Add TextWatcher to append "$" at the end
@@ -175,34 +232,80 @@ public class TransactionActivity extends AppCompatActivity {
                 btnExpense.setTextColor(getResources().getColor(R.color.toggle_text_unselected));
             }
         });
+        inputAmount.addTextChangedListener(new TextWatcher() {
+            private String current = "";
 
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals(current)) {
+                    inputAmount.removeTextChangedListener(this);
+
+                    try {
+                        String input = s.toString().replaceAll("[,.\\s$]", ""); // Remove existing formatting
+                        if (!input.isEmpty()) {
+                            long parsedAmount = Long.parseLong(input); // Parse the number
+
+                            if (parsedAmount > 1_000_000_000) { // Check for max limit
+                                amountErrorMessage.setText("Maximum amount is 999,999,999.99");
+                                amountErrorMessage.setVisibility(View.VISIBLE);
+                            } else {
+                                amountErrorMessage.setVisibility(View.GONE);
+                            }
+
+                            current = String.format("%,d", parsedAmount).replace(",", ".") + " $"; // Add formatting
+                            inputAmount.setText(current);
+                            inputAmount.setSelection(current.length() - 2); // Move cursor before "$"
+                        } else {
+                            amountErrorMessage.setVisibility(View.GONE);
+                        }
+                    } catch (NumberFormatException e) {
+                        amountErrorMessage.setVisibility(View.GONE);
+                    }
+
+                    inputAmount.addTextChangedListener(this);
+                }
+            }
+        });
         btnSubmit.setOnClickListener(v -> {
-            // Validate amount input
-            String amountText = inputAmount.getText().toString().replace("$", "").trim(); // Remove "$" and trim spaces
+            String amountText = inputAmount.getText().toString().replaceAll("[,.\\s$]", "").trim(); // Remove formatting
             if (amountText.isEmpty()) {
-                Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
+                amountErrorMessage.setText("Amount is required");
+                amountErrorMessage.setVisibility(View.VISIBLE);
                 return;
             }
 
             try {
-                double amount = Double.parseDouble(amountText); // Safely parse the cleaned input
+                long amount = Long.parseLong(amountText);
+                if (amount > 1_000_000_000) {
+                    amountErrorMessage.setText("Maximum amount is 999,999,999.99");
+                    amountErrorMessage.setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                amountErrorMessage.setVisibility(View.GONE); // Clear error if valid
+
                 String category = categorySpinner.getSelectedItem().toString();
                 String date = inputDate.getText().toString();
                 String notes = inputNotes.getText().toString();
 
-                // Determine if it's Income or Expense
                 int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 1 : 0;
 
-                // Save to the database
-                long transactionId = dbHelper.addTransaction(type, amount, notes, date, 1, getCategoryId(category)); // Assuming user ID is 1 for now
+                long transactionId = dbHelper.addTransaction(type, amount, notes, date, 1, getCategoryId(category));
                 if (transactionId != -1) {
                     Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // Close the activity after saving
+                    finish();
                 } else {
                     Toast.makeText(this, "Error saving transaction", Toast.LENGTH_SHORT).show();
                 }
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid amount entered", Toast.LENGTH_SHORT).show(); // Handle invalid input
+                amountErrorMessage.setText("Invalid amount entered");
+                amountErrorMessage.setVisibility(View.VISIBLE);
             }
         });
     }
