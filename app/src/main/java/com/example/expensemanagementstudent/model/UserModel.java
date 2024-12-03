@@ -1,8 +1,5 @@
 package com.example.expensemanagementstudent.model;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 public class UserModel {
     public int id;
     public String username;
@@ -88,6 +85,4 @@ public class UserModel {
     public void setUsername(String username) {
         this.username = username;
     }
-
 }
-

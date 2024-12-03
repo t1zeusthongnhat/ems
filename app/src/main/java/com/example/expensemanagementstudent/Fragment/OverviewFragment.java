@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.example.expensemanagementstudent.AllTransactionsActivity;
 import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
 import com.example.expensemanagementstudent.R;
-import com.example.expensemanagementstudent.TransactionActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -62,7 +61,7 @@ public class OverviewFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
 
         TextView greetingText = rootView.findViewById(R.id.greetingText);
-        TextView seeAllButton = rootView.findViewById(R.id.see_all_transactions);
+        TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
 
@@ -106,7 +105,7 @@ public class OverviewFragment extends Fragment {
         seeAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), TransactionActivity.class);
+                Intent intent = new Intent(getContext(), AllTransactionsActivity.class);
                 startActivity(intent);
             }
         });
