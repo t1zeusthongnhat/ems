@@ -106,5 +106,31 @@ public class UserDB  extends SQLiteOpenHelper {
 
         return "LOGIN_SUCCESS"; // Đăng nhập thành công
     }
+    public boolean isEmailExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM Users WHERE email = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+    public boolean checkEmailExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE email = ?", new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
+    public boolean resetPassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("password", newPassword);
+        int rows = db.update("users", values, "email = ?", new String[]{email});
+        db.close();
+        return rows > 0;
+    }
 
 }

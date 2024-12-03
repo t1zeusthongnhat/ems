@@ -348,7 +348,8 @@
                         android:background="@drawable/circle_background"
                         android:contentDescription="All Icon"
                         android:padding="16dp"
-                        android:src="@drawable/dashboard1" />
+                        android:src="@drawable/dashboard1"
+                        android:id="@+id/all_icon"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -389,14 +390,17 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/see_all_button"
+                    android:id="@+id/see_all_transactions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:text="See all"
                     android:textColor="#1681FF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:gravity="center"/>
 
             </LinearLayout>
 

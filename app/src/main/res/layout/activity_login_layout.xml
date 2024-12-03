@@ -30,7 +30,6 @@
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/lg" />
-
     </LinearLayout>
 
     <!-- Phần phía dưới với các trường nhập liệu và nút -->
@@ -81,7 +80,9 @@
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- TextInputLayout cho Mật khẩu với chức năng hiển thị mật khẩu -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -92,55 +93,68 @@
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusTopStart="12dp"
-            app:boxStrokeColor="@android:color/darker_gray">
+            app:boxStrokeColor="@android:color/darker_gray"
+            app:endIconMode="password_toggle"
+        app:endIconTint="@color/button_main"
+        android:contentDescription="Password Toggle">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <RelativeLayout
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextPasswordLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="90dp"
-            android:gravity="center">
+            android:hint="Password"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/textViewMsg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Don't have an account? "
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+    <!-- TextView Forgot Password -->
+    <TextView
+        android:id="@+id/textViewForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:text="Forgot Password?"
+        android:textColor="@color/button_main"
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textViewSignUp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/textViewMsg"
-                android:text="Sign up now."
-                android:textColor="@color/button_main"
-                android:textSize="12sp"
-                android:textStyle="italic" />
-        </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:gravity="center">
 
-        <Button
-            android:id="@+id/buttonGetStarted"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textViewMsg"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/button_main"
-            android:drawableRight="@drawable/baseline_arrow_forward_24"
-            android:drawablePadding="8dp"
-            android:padding="12dp"
-            android:paddingEnd="16dp"
-            android:text="Get started"
-            android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:text="Don't have an account? "
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/textViewSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/textViewMsg"
+            android:text="Sign up now."
+            android:textColor="@color/button_main"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+    </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/buttonGetStarted"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/button_main"
+        android:drawableRight="@drawable/baseline_arrow_forward_24"
+        android:drawablePadding="8dp"
+        android:padding="12dp"
+        android:paddingEnd="16dp"
+        android:text="Get started"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

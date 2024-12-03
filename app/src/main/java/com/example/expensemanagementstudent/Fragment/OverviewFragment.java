@@ -1,5 +1,6 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,8 +8,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.expensemanagementstudent.R;
+import com.example.expensemanagementstudent.TransactionActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,6 +21,7 @@ import com.example.expensemanagementstudent.R;
  */
 public class OverviewFragment extends Fragment {
 
+    private TextView see_all_button;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -55,12 +60,26 @@ public class OverviewFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_overview, container, false);
+        View view = inflater.inflate(R.layout.fragment_overview, container, false);
+        see_all_button = view.findViewById(R.id.see_all_transactions);
+        see_all_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentTrasaction = new Intent(getActivity(), TransactionActivity.class);
+                startActivity(intentTrasaction);
+            }
+        });
+
+        return view;
     }
+
+
 }
