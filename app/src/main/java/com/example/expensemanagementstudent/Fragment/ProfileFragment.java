@@ -1,5 +1,6 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,11 +19,12 @@ import com.example.expensemanagementstudent.db.UserDB;
 
 public class ProfileFragment extends Fragment {
     private TextView profileName;
-    private TextView phoneNumber;
+    private TextView tvAddress;
     private TextView emailAddress;
     private Button logoutButton;
     private UserDB userDB;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -30,7 +32,7 @@ public class ProfileFragment extends Fragment {
 
         // Initialize views
         profileName = view.findViewById(R.id.profileName);
-        phoneNumber = view.findViewById(R.id.phoneNumber);
+        tvAddress = view.findViewById(R.id.tvAddress);
         emailAddress = view.findViewById(R.id.emailAddress);
         logoutButton = view.findViewById(R.id.logoutButton);
 
@@ -38,10 +40,12 @@ public class ProfileFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "Username");
         String email = sharedPreferences.getString("email", "Not Provided");
+        String address = sharedPreferences.getString("address", "Not Provided");
 
         // Update the UI
         profileName.setText(username);
         emailAddress.setText(email);  // Set email or other details
+        tvAddress.setText(address);  // Set email or other details
 
         // Setup logout click listener
         logoutButton.setOnClickListener(v -> logout());

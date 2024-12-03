@@ -104,6 +104,7 @@ public class RegisterActivity extends AppCompatActivity {
             SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("username", user);
+            editor.putString("address", address);
             editor.putString("email", email);  // Optional: Store more info like email
             editor.putBoolean("isLoggedIn", true); // Mark as logged in
             editor.apply();
