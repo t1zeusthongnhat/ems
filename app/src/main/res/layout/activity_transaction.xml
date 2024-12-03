@@ -1,190 +1,47 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FAFAFA">
 
-    <!-- Header (Fixed at the Top) -->
+    <!-- Header với nút Back -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="@drawable/top_gradient"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="47dp"
-            android:layout_height="43dp"
-            android:background="@drawable/circle_bg_button"
-            android:padding="8dp"
+        <!-- Nút back -->
+        <ImageView
+            android:id="@+id/imgBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_back"
-            app:tint="@android:color/white" />
+            android:contentDescription="Back Button"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
+        <!-- Tiêu đề -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Transaction"
+            android:text="Transactions"
             android:textSize="20sp"
+            android:textColor="#1681FF"
             android:textStyle="bold"
-            android:layout_marginStart="16dp"
-            android:textColor="@android:color/white" />
+            android:layout_marginStart="16dp" />
     </LinearLayout>
 
-    <!-- Scrollable Content -->
-    <ScrollView
+    <!-- Transaction List -->
+    <ListView
+        android:id="@+id/lv_transactions"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="72dp"
-        android:fillViewport="true"
-        android:background="@drawable/scrollview_background"
-        android:padding="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:background="#FAFAFA" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/circle_background"
-        android:orientation="vertical">
-
-        <!-- Toggle Buttons -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/transaction_type_toggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="16dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_expense"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/toggle_selected"
-                android:text="Expense"
-                android:textColor="@color/toggle_text_selected"
-                app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_income"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/toggle_unselected"
-                android:text="Income"
-                android:textColor="@color/toggle_text_unselected"
-                app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <!-- Form Fields -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/input_amount_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/input_background"
-            app:hintEnabled="true"
-            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_amount"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/edittext_background_selector"
-                android:hint="Amount"
-                android:imeOptions="actionDone"
-                android:inputType="numberDecimal"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <TextView
-            android:id="@+id/amount_error_message"
-            android:layout_width="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/delete_red"
-            android:textSize="14sp"
-            android:visibility="gone"
-            android:drawableStart="@drawable/ic_warning"
-            android:drawablePadding="5dp"
-            android:paddingStart="10dp"
-            android:paddingTop="4dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/input_category_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/input_background"
-            app:hintEnabled="true"
-            android:hint="Choose Category">
-
-            <Spinner
-                android:id="@+id/category_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:background="@drawable/edittext_background_selector"
-                android:padding="16dp"
-                android:spinnerMode="dropdown" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:hintEnabled="true"
-            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_date"
-                android:layout_width="match_parent"
-                android:layout_height="74dp"
-                android:background="@drawable/edittext_background_selector"
-                android:focusable="false"
-                android:hint="Date"
-                android:textSize="20sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Description Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:hintEnabled="true"
-            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_notes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/edittext_background_selector"
-                android:hint="Description"
-                android:textSize="20sp" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_submit"
-            android:layout_width="match_parent"
-            android:layout_height="59dp"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/button_main"
-            android:text="Add transaction"
-            android:textColor="@color/white" />
-    </LinearLayout>
-</ScrollView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
