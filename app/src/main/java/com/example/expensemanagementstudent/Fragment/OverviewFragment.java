@@ -1,6 +1,9 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,25 +12,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.expensemanagementstudent.AllTransactionsActivity;
+import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
 import com.example.expensemanagementstudent.R;
-import com.example.expensemanagementstudent.TransactionActivity;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OverviewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class OverviewFragment extends Fragment {
 
-    private TextView see_all_button;
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private TextView monthYearDisplay;
+    private Calendar calendar;
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -35,15 +38,6 @@ public class OverviewFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OverviewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static OverviewFragment newInstance(String param1, String param2) {
         OverviewFragment fragment = new OverviewFragment();
         Bundle args = new Bundle();
@@ -60,26 +54,70 @@ public class OverviewFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_overview, container, false);
-        see_all_button = view.findViewById(R.id.see_all_transactions);
-        see_all_button.setOnClickListener(new View.OnClickListener() {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
+
+        TextView greetingText = rootView.findViewById(R.id.greetingText);
+        TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
+
+        // Thêm Intent chuyển đến CategoryActivity
+        btnAddCategory.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intentTrasaction = new Intent(getActivity(), TransactionActivity.class);
-                startActivity(intentTrasaction);
+            public void onClick(View view) {
+                // Chuyển đến CategoryActivity
+                Intent intent = new Intent(getContext(), CategoryActivity.class);
+                startActivity(intent);
             }
         });
 
-        return view;
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "Username");
+
+        greetingText.setText("Hi " + username + ",");
+
+        monthYearDisplay = rootView.findViewById(R.id.month_year_display);
+        ImageView previousMonth = rootView.findViewById(R.id.previous_month);
+        ImageView nextMonth = rootView.findViewById(R.id.next_month);
+
+        calendar = Calendar.getInstance();
+        updateMonthYearDisplay();
+
+        previousMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.MONTH, -1);
+                updateMonthYearDisplay();
+            }
+        });
+        nextMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.MONTH, 1);
+                updateMonthYearDisplay();
+            }
+        });
+
+        seeAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), AllTransactionsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        return rootView;
     }
 
+    private void updateMonthYearDisplay() {
+        // Force the locale to English
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.ENGLISH);
+        String formattedDate = dateFormat.format(calendar.getTime());
+        monthYearDisplay.setText(formattedDate);
+    }
 
 }

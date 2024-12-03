@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.ExpenseManagementStudent" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="colorPrimary">#1681FF</item>
+        <item name="colorPrimaryVariant">#FFFFFF</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -19,7 +19,10 @@
         <item name="android:windowLightStatusBar">true</item> <!-- Ensure icons are visible -->
     </style>
 
-
+    <style name="TextAppearance.App.TextInputLayout" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorControlHighlight">@android:color/transparent</item>
     </style>

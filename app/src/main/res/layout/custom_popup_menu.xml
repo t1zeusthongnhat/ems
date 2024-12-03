@@ -1,0 +1,56 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/custom_popup_background"
+    android:orientation="vertical">
+
+    <!-- Nút Update -->
+    <LinearLayout
+        android:id="@+id/action_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            app:tint="@color/button_main" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Update"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <!-- Nút Delete -->
+    <LinearLayout
+        android:id="@+id/action_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@android:color/holo_red_dark"> <!-- Màu đỏ cho nút Delete -->
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_delete" /> <!-- Đặt icon Delete -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Delete"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@color/white" /> <!-- Chữ màu trắng trên nền đỏ -->
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,49 @@
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    id 'org.jetbrains.kotlin.android' version '1.8.10' apply false\r\n}\r\n\r\nandroid {\r\n    namespace 'com.example.expensemanagementstudent'\r\n    compileSdk 34\r\n\r\n    defaultConfig {\r\n        applicationId \"com.example.expensemanagementstudent\"\r\n        minSdk 25\r\n        targetSdk 34\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n        multiDexEnabled true\r\n\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility JavaVersion.VERSION_1_8\r\n        targetCompatibility JavaVersion.VERSION_1_8\r\n    }\r\n    buildFeatures {\r\n        dataBinding true\r\n        viewBinding true\r\n    }\r\n}\r\nconfigurations.all {\r\n    resolutionStrategy {\r\n        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'\r\n        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10'\r\n        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10'\r\n    }\r\n}\r\ndependencies {\r\n\r\n    implementation libs.appcompat\r\n    implementation libs.material\r\n\r\n    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'\r\n    testImplementation 'junit:junit:4.13.2'\r\n    androidTestImplementation 'androidx.test.ext:junit:1.1.5'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'\r\n\r\n    implementation 'com.google.android.material:material:1.9.0'\r\n    // Lottie Animation\r\n    implementation('com.airbnb.android:lottie:6.3.0') {\r\n        exclude group: 'org.jetbrains.kotlin'\r\n    }\r\n\r\n    // MPAndroidChart\r\n    implementation('com.github.PhilJay:MPAndroidChart:v3.1.0') {\r\n        exclude group: 'org.jetbrains.kotlin'\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	(revision 9fd7e5c7a82713d907f7b16821ed5f9bd57346ef)
++++ b/app/build.gradle	(date 1732874794043)
+@@ -60,4 +60,4 @@
+     implementation('com.github.PhilJay:MPAndroidChart:v3.1.0') {
+         exclude group: 'org.jetbrains.kotlin'
+     }
+-}
+\ No newline at end of file
++}
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2024-11-29T03:05:47.186415Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"PhysicalDevice\" identifier=\"serial=R58T10JCFZX\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"MainActivity\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"CategoryActivity\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2024-11-29T02:07:33.638516Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"LocalEmulator\" identifier=\"path=C:\\Users\\admin\\.android\\avd\\Pixel_4_API_35.avd\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision 9fd7e5c7a82713d907f7b16821ed5f9bd57346ef)
++++ b/.idea/deploymentTargetSelector.xml	(date 1732874892823)
+@@ -13,20 +13,6 @@
+         </DropdownSelection>
+         <DialogSelection />
+       </SelectionState>
+-      <SelectionState runConfigName="MainActivity">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-      <SelectionState runConfigName="CategoryActivity">
+-        <option name="selectionMode" value="DROPDOWN" />
+-        <DropdownSelection timestamp="2024-11-29T02:07:33.638516Z">
+-          <Target type="DEFAULT_BOOT">
+-            <handle>
+-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\admin\.android\avd\Pixel_4_API_35.avd" />
+-            </handle>
+-          </Target>
+-        </DropdownSelection>
+-        <DialogSelection />
+-      </SelectionState>
+     </selectionStates>
+   </component>
+ </project>
+\ No newline at end of file

@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">CEMs</string>
+    <string name="app_name">EMs</string>
     <!-- TODO: Remove or change this placeholder text -->
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
+    <string name="category_hint">Category</string>
+    <string name="category_hint_default">Select a category</string>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
@@ -17,4 +19,13 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Other string resources -->
+    <string name="category_icon">Category Icon</string>
+
+        <string-array name="category_type_array">
+            <item>Income</item>
+            <item>Expense</item>
+        </string-array>
+
+
 </resources>
