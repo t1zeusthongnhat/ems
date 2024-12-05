@@ -10,7 +10,8 @@
 
     <color name="button_main">#1681FF</color>
     <color name="colorTextSecondary">#757575</color>
-
+    <color name="red">#FF0000</color> <!-- Đỏ -->
+    <color name="green">#6ABE6E</color> <!-- Xanh lục -->
 
     <color name="selected_color">#1681FF</color>
     <color name="unselected_color">#808080</color>

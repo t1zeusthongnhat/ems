@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.expensemanagementstudent.Fragment.AccountFragment;
+import com.example.expensemanagementstudent.Fragment.ReportFragment;
 import com.example.expensemanagementstudent.Fragment.InsightFragment;
 import com.example.expensemanagementstudent.Fragment.OverviewFragment;
 import com.example.expensemanagementstudent.Fragment.ProfileFragment;
@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new OverviewFragment();
                 } else if (id == R.id.tracking) {
                     selectedFragment = new InsightFragment();
-                } else if (id == R.id.account) {
-                    selectedFragment = new AccountFragment();
+                } else if (id == R.id.Report) {
+                    selectedFragment = new ReportFragment();
                 } else if (id == R.id.profile) {
                     selectedFragment = new ProfileFragment();
                 }

@@ -13,9 +13,9 @@
         android:title=" "
         android:enabled="false"/>
 
-    <item android:id="@+id/account"
-        android:icon="@drawable/ic_wallet"
-        android:title="Account"/>
+    <item android:id="@+id/Report"
+        android:icon="@drawable/ic_report"
+        android:title="Report"/>
 
     <item android:id="@+id/profile"
         android:icon="@drawable/ic_person"
