@@ -10,15 +10,19 @@ import android.util.Log;
 public class ExpenseDB {
 
     private SQLiteDatabase db;
+    private DatabaseHelper dbHelper; // Add dbHelper as a field
 
     public ExpenseDB(Context context) {
-        DatabaseHelper helper = new DatabaseHelper(context);
-        db = helper.getWritableDatabase();
+        dbHelper = new DatabaseHelper(context); // Initialize dbHelper
+        db = dbHelper.getWritableDatabase();
     }
-    //substr(e.date, 7, 4) lấy năm từ dd-MM-yyyy.
-    //substr(e.date, 4, 2) lấy tháng.
-    //substr(e.date, 1, 2) lấy ngày.
-    //Sau đó, ghép chúng lại thành định dạng yyyy-MM-dd trước khi sử dụng strftime.
+
+    // Provide access to DatabaseHelper's getReadableDatabase
+    public SQLiteDatabase getReadableDatabase() {
+        return dbHelper.getReadableDatabase(); // Use the initialized dbHelper
+    }
+
+    // Get expenses by category and month
     public Cursor getExpenseByCategoryAndMonth(int userId, String month, String year) {
         String query = "SELECT c.name, SUM(e.amount) " +
                 "FROM expenses e " +
@@ -42,7 +46,7 @@ public class ExpenseDB {
         String query = "SELECT * " +
                 "FROM expenses " +
                 "WHERE user_id = ? AND strftime('%m', date) = ?";
-        Cursor cursor = db.rawQuery(query, new String[] { String.valueOf(userId), month });
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), month});
 
         if (cursor.moveToFirst()) {
             do {
@@ -57,21 +61,58 @@ public class ExpenseDB {
         cursor.close();
     }
 
-    // Thêm một giao dịch thu/chi
+    // Add a transaction (income or expense)
     public long addTransaction(int type, double amount, String description, String date, int userId, int categoryId) {
         ContentValues values = new ContentValues();
 
-        // Gắn các giá trị tương ứng cho các cột
-        values.put(DatabaseHelper.TYPE_COL, type); // Loại giao dịch (0: thu nhập, 1: chi tiêu)
-        values.put(DatabaseHelper.AMOUNT_COL, amount); // Số tiền giao dịch
-        values.put(DatabaseHelper.DESCRIPTION_COL, description); // Mô tả giao dịch
-        values.put(DatabaseHelper.DATE_COL, date); // Ngày giao dịch
-        values.put(DatabaseHelper.EXPENSE_USER_ID_COL, userId); // ID người dùng
-        values.put(DatabaseHelper.EXPENSE_CATEGORY_ID_COL, categoryId); // ID danh mục giao dịch
+        // Set column values
+        values.put(DatabaseHelper.TYPE_COL, type); // Type (0: income, 1: expense)
+        values.put(DatabaseHelper.AMOUNT_COL, amount); // Amount
+        values.put(DatabaseHelper.DESCRIPTION_COL, description); // Description
+        values.put(DatabaseHelper.DATE_COL, date); // Date
+        values.put(DatabaseHelper.EXPENSE_USER_ID_COL, userId); // User ID
+        values.put(DatabaseHelper.EXPENSE_CATEGORY_ID_COL, categoryId); // Category ID
 
-        // Thêm dữ liệu vào bảng "expenses"
+        // Insert into the "expenses" table
         return db.insert(DatabaseHelper.EXPENSE_TABLE, null, values);
     }
 
+    public Cursor getAllTransactions() {
+        String query = "SELECT e.*, c.name AS category_name " +
+                "FROM " + DatabaseHelper.EXPENSE_TABLE + " e " +
+                "INNER JOIN " + DatabaseHelper.CATEGORY_TABLE + " c " +
+                "ON e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = c." + DatabaseHelper.CATEGORY_ID_COL +
+                " ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
+        return db.rawQuery(query, null);
+    }
 
+    public Cursor getTransactionsByType(int type) {
+        String query = "SELECT e.*, c.name AS category_name " +
+                "FROM " + DatabaseHelper.EXPENSE_TABLE + " e " +
+                "INNER JOIN " + DatabaseHelper.CATEGORY_TABLE + " c " +
+                "ON e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = c." + DatabaseHelper.CATEGORY_ID_COL +
+                " WHERE e." + DatabaseHelper.TYPE_COL + " = ? " +
+                "ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
+        return db.rawQuery(query, new String[]{String.valueOf(type)});
+    }
+
+    public Cursor getTransactionsByCategory(String categoryName) {
+        String query = "SELECT e.*, c.name AS category_name " +
+                "FROM " + DatabaseHelper.EXPENSE_TABLE + " e " +
+                "INNER JOIN " + DatabaseHelper.CATEGORY_TABLE + " c " +
+                "ON e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = c." + DatabaseHelper.CATEGORY_ID_COL +
+                " WHERE c." + DatabaseHelper.CATEGORY_NAME_COL + " = ? " +
+                "ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
+        return db.rawQuery(query, new String[]{categoryName});
+    }
+
+    public Cursor getFilteredTransactions(int type, int categoryId) {
+        String query = "SELECT e.*, c.name AS category_name " +
+                "FROM " + DatabaseHelper.EXPENSE_TABLE + " e " +
+                "INNER JOIN " + DatabaseHelper.CATEGORY_TABLE + " c " +
+                "ON e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = c." + DatabaseHelper.CATEGORY_ID_COL +
+                " WHERE e." + DatabaseHelper.TYPE_COL + " = ? AND e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = ? " +
+                "ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
+        return db.rawQuery(query, new String[]{String.valueOf(type), String.valueOf(categoryId)});
+    }
 }

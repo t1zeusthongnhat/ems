@@ -2,6 +2,7 @@ package com.example.expensemanagementstudent;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -153,7 +154,8 @@ public class TransactionActivity extends AppCompatActivity {
         });
 
         btnSubmit.setOnClickListener(v -> {
-            String amountText = inputAmount.getText().toString().replaceAll("[,.\\s]", "").trim(); // Remove formatting
+            // Remove formatting and validate amount input
+            String amountText = inputAmount.getText().toString().replaceAll("[,.\\s]", "").trim();
             if (amountText.isEmpty()) {
                 amountErrorMessage.setText("Amount is required");
                 amountErrorMessage.setVisibility(View.VISIBLE);
@@ -168,14 +170,30 @@ public class TransactionActivity extends AppCompatActivity {
                     return;
                 }
 
-                amountErrorMessage.setVisibility(View.GONE); // Clear error if valid
+                // Clear the error message if input is valid
+                amountErrorMessage.setVisibility(View.GONE);
 
+                // Validate category selection
                 String category = categorySpinner.getSelectedItem().toString();
-                String date = inputDate.getText().toString();
-                String notes = inputNotes.getText().toString();
+                if (category.isEmpty() || category.equals("Select Category")) {
+                    Toast.makeText(this, "Please select a valid category", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                // Validate date input
+                String date = inputDate.getText().toString();
+                if (date.isEmpty()) {
+                    Toast.makeText(this, "Please select a date", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Notes are optional but can be trimmed
+                String notes = inputNotes.getText().toString().trim();
+
+                // Determine transaction type (1 = Income, 0 = Expense)
                 int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 1 : 0;
 
+                // Retrieve the logged-in user's ID from SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
                 int userId = sharedPreferences.getInt("userId", -1);
                 if (userId == -1) {
@@ -184,20 +202,30 @@ public class TransactionActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Save the transaction to the database
                 long transactionId = expenseDB.addTransaction(type, amount, notes, date, userId, categoryDB.getCategoryId(category));
                 if (transactionId != -1) {
+                    // Notify the user of success
                     String successMessage = (type == 1) ? "Income saved successfully" : "Expense saved successfully";
                     Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show();
 
+                    // Set result to indicate success and refresh data in the previous activity/fragment
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("transactionAdded", true);
+                    setResult(RESULT_OK, resultIntent);
+
+                    // Close the activity
                     finish();
                 } else {
                     Toast.makeText(this, "Error saving transaction", Toast.LENGTH_SHORT).show();
                 }
             } catch (NumberFormatException e) {
+                // Handle invalid amount input
                 amountErrorMessage.setText("Invalid amount entered");
                 amountErrorMessage.setVisibility(View.VISIBLE);
             }
         });
+
 
     }
 
