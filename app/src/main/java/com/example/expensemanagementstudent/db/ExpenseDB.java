@@ -27,7 +27,8 @@ public class ExpenseDB {
         String query = "SELECT c.name, SUM(e.amount) " +
                 "FROM expenses e " +
                 "INNER JOIN categories c ON e.category_id = c._id " +
-                "WHERE e.user_id = ? AND strftime('%m', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
+                "WHERE e.user_id = ? AND e.type = 1 " + // Thêm điều kiện lọc e.type = 1
+                "AND strftime('%m', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
                 "AND strftime('%Y', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
                 "GROUP BY c.name";
         return db.rawQuery(query, new String[]{String.valueOf(userId), month, year});

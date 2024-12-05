@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="#ffffff"
-    android:layout_marginBottom="40dp">
+    android:layout_marginBottom="50dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,6 +120,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_marginBottom="16dp" />
+            <TextView
+                android:id="@+id/comparisonCommentText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:paddingTop="16dp"
+                android:gravity="center_horizontal"
+                android:text="Comparison Comment" />
+
 
 
         </LinearLayout>
