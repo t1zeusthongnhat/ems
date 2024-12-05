@@ -130,6 +130,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE " + CATEGORY_TABLE + "_old;");
         }
     }
+    public Cursor getUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT id, username FROM users WHERE username = ? AND password = ?",
+                new String[]{username, password}
+        );
+    }
 
 
 

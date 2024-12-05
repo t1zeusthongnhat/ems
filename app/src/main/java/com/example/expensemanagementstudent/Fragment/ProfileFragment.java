@@ -68,4 +68,5 @@ public class ProfileFragment extends Fragment {
         getActivity().finish();  // Close the current activity
     }
 
+
 }

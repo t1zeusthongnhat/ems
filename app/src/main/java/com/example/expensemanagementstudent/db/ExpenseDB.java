@@ -106,6 +106,14 @@ public class ExpenseDB {
                 "ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
         return db.rawQuery(query, new String[]{categoryName});
     }
+    public Cursor getTransactionsByUserId(int userId) {
+        String query = "SELECT e.*, c.name AS category_name " +
+                "FROM expenses e " +
+                "INNER JOIN categories c ON e.category_id = c._id " +
+                "WHERE e.user_id = ? " +
+                "ORDER BY e.date DESC";
+        return db.rawQuery(query, new String[]{String.valueOf(userId)});
+    }
 
     public Cursor getFilteredTransactions(int type, int categoryId) {
         String query = "SELECT e.*, c.name AS category_name " +

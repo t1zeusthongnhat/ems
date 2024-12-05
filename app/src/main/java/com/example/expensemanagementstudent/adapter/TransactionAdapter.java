@@ -41,7 +41,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.amount.setText(transaction.getFormattedAmount());
 
         // Set the icon and text color based on the transaction type
-        if (transaction.getType() == 1) { // Expense
+        if (transaction.getType() == 0) { // Expense
             holder.icon.setImageResource(R.drawable.ic_minus); // Replace with your minus icon
             holder.amount.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         } else { // Income

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -70,7 +71,6 @@ public class OverviewFragment extends Fragment {
 
         TextView greetingText = rootView.findViewById(R.id.greetingText);
         TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
 
         // Initialize the database
@@ -106,12 +106,9 @@ public class OverviewFragment extends Fragment {
             updateMonthYearDisplay();
         });
 
-        seeAllButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
-                startActivityForResult(intent, 1);
-            }
+        seeAllButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
+            startActivityForResult(intent, 1);
         });
 
         // Load transactions dynamically into the container
@@ -125,6 +122,7 @@ public class OverviewFragment extends Fragment {
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -132,23 +130,33 @@ public class OverviewFragment extends Fragment {
     }
 
     private void loadTransactions() {
-        Cursor cursor = expenseDB.getAllTransactions();
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+        if (userId == -1) {
+            Toast.makeText(getContext(), "User ID not found. Please log in again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        transactionListContainer.removeAllViews(); // Clear previous transactions
+        Cursor cursor = expenseDB.getTransactionsByUserId(userId);
+        int limit = 2; // Show only two newest transactions
+        int count = 0;
+
         if (cursor != null) {
-            int count = 0; // Counter to limit transactions
-            while (cursor.moveToNext() && count < 2) { // Limit to 2 transactions
+            while (cursor.moveToNext() && count < limit) {
                 String category = cursor.getString(cursor.getColumnIndex("category_name"));
                 String description = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DESCRIPTION_COL));
                 double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.AMOUNT_COL));
                 int type = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.TYPE_COL));
-                String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DATE_COL)); // Fetch the date
+                String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DATE_COL));
 
-                addTransactionItem(category, description, amount, type, date); // Pass the date
-
-                count++; // Increment counter
+                addTransactionItem(category, description, amount, type, date);
+                count++;
             }
             cursor.close();
         }
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -158,24 +166,25 @@ public class OverviewFragment extends Fragment {
         }
     }
 
-
     private void addTransactionItem(String category, String description, double amount, int type, String date) {
         View transactionItem = LayoutInflater.from(getContext()).inflate(R.layout.transaction_item, transactionListContainer, false);
 
         TextView categoryView = transactionItem.findViewById(R.id.transaction_category);
         TextView descriptionView = transactionItem.findViewById(R.id.transaction_description);
         TextView amountView = transactionItem.findViewById(R.id.transaction_amount);
-        TextView dateView = transactionItem.findViewById(R.id.transaction_date); // Ensure this ID exists
+        TextView dateView = transactionItem.findViewById(R.id.transaction_date);
 
         categoryView.setText(category);
         descriptionView.setText(description);
-        amountView.setText(String.format("%,.2f $", amount));
-        dateView.setText(date); // Set the date text
+        dateView.setText(date);
 
-        if (type == 1) { // Expense
-            amountView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-        } else { // Income
+        // Format the amount with a "+" or "-" and apply color based on type
+        if (type == 1) { // Income
+            amountView.setText(String.format("+ %, .2f $", amount));
             amountView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        } else { // Expense
+            amountView.setText(String.format("- %, .2f $", amount));
+            amountView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
         }
 
         transactionListContainer.addView(transactionItem);

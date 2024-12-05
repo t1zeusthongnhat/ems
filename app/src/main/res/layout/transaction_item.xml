@@ -50,8 +50,7 @@
             android:id="@+id/transaction_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_plus" />
+            android:layout_marginEnd="8dp"/>
 
         <!-- Amount -->
         <TextView
