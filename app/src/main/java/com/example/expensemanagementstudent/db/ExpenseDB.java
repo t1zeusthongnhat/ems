@@ -29,6 +29,14 @@ public class ExpenseDB {
                 "GROUP BY c.name";
         return db.rawQuery(query, new String[]{String.valueOf(userId), month, year});
     }
+    public Cursor getTransactionsByDateRange(int userId, String startDate, String endDate) {
+        String query = "SELECT * FROM expenses " +
+                "WHERE user_id = ? " +
+                "AND date BETWEEN ? AND ?";
+        return db.rawQuery(query, new String[]{String.valueOf(userId), startDate, endDate});
+    }
+
+
 
     public Cursor getTotalByType(int userId, String month, String year, int type) {
         String query = "SELECT SUM(e.amount) " +
@@ -57,6 +65,11 @@ public class ExpenseDB {
         }
         cursor.close();
     }
+    public Cursor getCategoryById(int categoryId) {
+        String query = "SELECT name FROM categories WHERE _id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(categoryId)});
+    }
+
 
     // Thêm một giao dịch thu/chi
     public long addTransaction(int type, double amount, String description, String date, int userId, int categoryId) {
