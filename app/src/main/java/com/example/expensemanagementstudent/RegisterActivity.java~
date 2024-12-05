@@ -77,10 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Kiểm tra tính hợp lệ của đầu vào
         if (!validateInput(username, password, email, address, gender)) return;
-        if (userDB.isUsernameExists(username)) {
-            Toast.makeText(this, "This username is already taken!", Toast.LENGTH_SHORT).show();
-            return;
-        }
+
         // Kiểm tra email đã tồn tại chưa
         if (userDB.isEmailExists(email)) {
             Toast.makeText(this, "This email is already registered!", Toast.LENGTH_SHORT).show();

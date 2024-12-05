@@ -43,8 +43,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 return;
             }
 
-            if (newPassword.length() < 6) {
-                Toast.makeText(this, "Password must be at least 6 characters!", Toast.LENGTH_SHORT).show();
+            // Kiểm tra tính hợp lệ của mật khẩu và lấy thông báo lỗi
+            String validationError = validatePassword(newPassword);
+            if (validationError != null) {
+                Toast.makeText(this, validationError, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -61,5 +63,46 @@ public class ResetPasswordActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Phương thức kiểm tra và trả về lỗi đầu tiên phát hiện
+    private String validatePassword(String password) {
+        if (password.length() < 6) {
+            return "Password must be at least 6 characters long!";
+        }
+        if (!containsUpperCase(password)) {
+            return "Password must include at least one uppercase letter!";
+        }
+        if (!containsLowerCase(password)) {
+            return "Password must include at least one lowercase letter!";
+        }
+        if (!containsDigit(password)) {
+            return "Password must include at least one digit!";
+        }
+        if (!containsSpecialCharacter(password)) {
+            return "Password must include at least one special character!";
+        }
+        return null; // Không có lỗi
+    }
+
+    // Kiểm tra nếu có ít nhất một chữ cái viết hoa
+    private boolean containsUpperCase(String password) {
+        return password.matches(".*[A-Z].*");
+    }
+
+    // Kiểm tra nếu có ít nhất một chữ cái viết thường
+    private boolean containsLowerCase(String password) {
+        return password.matches(".*[a-z].*");
+    }
+
+    // Kiểm tra nếu có ít nhất một chữ số
+    private boolean containsDigit(String password) {
+        return password.matches(".*\\d.*");
+    }
+
+    // Kiểm tra nếu có ít nhất một ký tự đặc biệt
+    private boolean containsSpecialCharacter(String password) {
+        return password.matches(".*[@#$%^&+=!].*");
+    }
+
 }
 

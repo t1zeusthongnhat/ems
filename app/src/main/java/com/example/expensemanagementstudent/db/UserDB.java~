@@ -132,13 +132,5 @@ public class UserDB  extends SQLiteOpenHelper {
         db.close();
         return rows > 0;
     }
-    public boolean isUsernameExists(String username) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM Users WHERE username = ?", new String[]{username});
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
-        return exists;
-    }
 
 }
