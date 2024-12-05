@@ -1,5 +1,7 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -28,18 +30,15 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
-
-import java.util.Calendar;
-import android.widget.ArrayAdapter;
-import java.util.Calendar;
 
 public class InsightFragment extends Fragment {
 
     private PieChart pieChart, halfDonutChart;
     private LinearLayout categoryOverviewLayout;
     private ExpenseDB expenseDB;
-    private int userId = 1; // Thay bằng ID người dùng thực tế
+    private int userId; // Lấy userId động
     private Spinner monthSpinner, yearSpinner;
 
     @Override
@@ -59,6 +58,16 @@ public class InsightFragment extends Fragment {
         yearSpinner = view.findViewById(R.id.yearSpinner);
         categoryOverviewLayout = view.findViewById(R.id.categoryOverviewLayout);
         expenseDB = new ExpenseDB(requireContext());
+
+        // Lấy userId từ SharedPreferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        userId = sharedPreferences.getInt("userId", -1);
+
+        // Kiểm tra nếu userId không có thì không làm gì thêm
+        if (userId == -1) {
+            // Xử lý userId invalid (ví dụ: show error)
+            return;
+        }
 
         // Thiết lập Adapter cho Spinner
         ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(
