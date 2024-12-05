@@ -39,6 +39,18 @@ public class UserDB {
         }
         return userId;
     }
+    public boolean updateUserDetails(long userId, String email, String address) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.EMAIL_COL, email);
+        values.put(DatabaseHelper.ADDRESS_COL, address);
+
+        int rowsAffected = db.update(DatabaseHelper.USER_TABLE, values,
+                DatabaseHelper.USER_ID_COL + " = ?",
+                new String[]{String.valueOf(userId)});
+        return rowsAffected > 0;
+    }
+
+
     // Thêm người dùng mới
     public long addNewAccountUser(String username, String password, String email, String gender, String address) {
         ContentValues values = new ContentValues();
