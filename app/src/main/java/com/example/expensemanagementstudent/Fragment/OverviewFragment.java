@@ -5,15 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.example.expensemanagementstudent.AllTransactionsActivity;
 import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
@@ -27,6 +28,7 @@ public class OverviewFragment extends Fragment {
 
     private TextView monthYearDisplay;
     private Calendar calendar;
+    private LinearLayout notificationLayout;
 
 
     private static final String ARG_PARAM1 = "param1";
@@ -111,6 +113,16 @@ public class OverviewFragment extends Fragment {
             }
         });
 
+        ImageView notificationIcon = rootView.findViewById(R.id.notificationIcon);
+        notificationLayout = rootView.findViewById(R.id.notificationLayout);
+
+        notificationIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleNotification();
+            }
+        });
+
         return rootView;
     }
 
@@ -119,6 +131,16 @@ public class OverviewFragment extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.ENGLISH);
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
+    }
+
+    private void toggleNotification() {
+        if (notificationLayout.getVisibility() == View.GONE) {
+            notificationLayout.setVisibility(View.VISIBLE);
+            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_down));
+        } else {
+            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_up));
+            notificationLayout.setVisibility(View.GONE);
+        }
     }
 
 }

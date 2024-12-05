@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <!-- Khai báo quyền đọc và ghi bộ nhớ -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,13 +20,17 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7a820580d64625a0995abeb27428bf4f7c2c838b
         <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".onboarding.ContainerActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordActivity" android:exported="true"/>
         <activity android:name=".ResetPasswordActivity" android:exported="true"/>
+        <activity android:name=".NotificationListActivity" android:exported="true"/>
         <activity
             android:name=".TransactionActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
