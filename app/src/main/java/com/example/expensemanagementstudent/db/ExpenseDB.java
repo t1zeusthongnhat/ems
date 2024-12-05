@@ -1,9 +1,11 @@
 package com.example.expensemanagementstudent.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class ExpenseDB {
 
@@ -12,6 +14,47 @@ public class ExpenseDB {
     public ExpenseDB(Context context) {
         DatabaseHelper helper = new DatabaseHelper(context);
         db = helper.getWritableDatabase();
+    }
+    //substr(e.date, 7, 4) lấy năm từ dd-MM-yyyy.
+    //substr(e.date, 4, 2) lấy tháng.
+    //substr(e.date, 1, 2) lấy ngày.
+    //Sau đó, ghép chúng lại thành định dạng yyyy-MM-dd trước khi sử dụng strftime.
+    public Cursor getExpenseByCategoryAndMonth(int userId, String month, String year) {
+        String query = "SELECT c.name, SUM(e.amount) " +
+                "FROM expenses e " +
+                "INNER JOIN categories c ON e.category_id = c._id " +
+                "WHERE e.user_id = ? AND strftime('%m', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
+                "AND strftime('%Y', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
+                "GROUP BY c.name";
+        return db.rawQuery(query, new String[]{String.valueOf(userId), month, year});
+    }
+
+    public Cursor getTotalByType(int userId, String month, String year, int type) {
+        String query = "SELECT SUM(e.amount) " +
+                "FROM expenses e " +
+                "WHERE e.user_id = ? AND e.type = ? AND strftime('%m', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ? " +
+                "AND strftime('%Y', substr(e.date, 7, 4) || '-' || substr(e.date, 4, 2) || '-' || substr(e.date, 1, 2)) = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(type), month, year});
+    }
+
+    @SuppressLint("Range")
+    public void logExpensesForMonth(int userId, String month) {
+        String query = "SELECT * " +
+                "FROM expenses " +
+                "WHERE user_id = ? AND strftime('%m', date) = ?";
+        Cursor cursor = db.rawQuery(query, new String[] { String.valueOf(userId), month });
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("ExpenseDB", "ID: " + cursor.getInt(cursor.getColumnIndex("id")) +
+                        ", Amount: " + cursor.getFloat(cursor.getColumnIndex("amount")) +
+                        ", Date: " + cursor.getString(cursor.getColumnIndex("date")) +
+                        ", Category ID: " + cursor.getInt(cursor.getColumnIndex("category_id")));
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("ExpenseDB", "No expenses found for the month: " + month);
+        }
+        cursor.close();
     }
 
     // Thêm một giao dịch thu/chi
@@ -29,48 +72,6 @@ public class ExpenseDB {
         // Thêm dữ liệu vào bảng "expenses"
         return db.insert(DatabaseHelper.EXPENSE_TABLE, null, values);
     }
-
-    // Lấy tất cả các khoản thu/chi
-    public Cursor getAllExpenses() {
-        return db.query(DatabaseHelper.EXPENSE_TABLE, null, null, null, null, null, DatabaseHelper.DATE_COL + " DESC");
-    }
-
-    // Lấy các khoản thu/chi theo loại (1: income, 0: expense)
-    public Cursor getExpensesByType(int type) {
-        return db.query(DatabaseHelper.EXPENSE_TABLE, null, DatabaseHelper.TYPE_COL + " = ?", new String[]{String.valueOf(type)}, null, null, DatabaseHelper.DATE_COL + " DESC");
-    }
-
-    // Xóa một khoản thu/chi
-    public int deleteExpense(int id) {
-        return db.delete(DatabaseHelper.EXPENSE_TABLE, DatabaseHelper.EXPENSE_ID_COL + " = ?", new String[]{String.valueOf(id)});
-    }
-    // Tính tổng thu nhập cho một người dùng
-    public double getTotalIncome(int userId) {
-        double totalIncome = 0.0;
-        String query = "SELECT SUM(" + DatabaseHelper.AMOUNT_COL + ") FROM " + DatabaseHelper.EXPENSE_TABLE +
-                " WHERE " + DatabaseHelper.EXPENSE_USER_ID_COL + " = ? AND " + DatabaseHelper.TYPE_COL + " = 0"; // 0: thu nhập
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-        if (cursor.moveToFirst()) {
-            totalIncome = cursor.getDouble(0);
-        }
-        cursor.close();
-        return totalIncome;
-    }
-
-    // Tính tổng chi tiêu cho một người dùng
-    public double getTotalExpense(int userId) {
-        double totalExpense = 0.0;
-        String query = "SELECT SUM(" + DatabaseHelper.AMOUNT_COL + ") FROM " + DatabaseHelper.EXPENSE_TABLE +
-                " WHERE " + DatabaseHelper.EXPENSE_USER_ID_COL + " = ? AND " + DatabaseHelper.TYPE_COL + " = 1"; // 1: chi tiêu
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-        if (cursor.moveToFirst()) {
-            totalExpense = cursor.getDouble(0);
-        }
-        cursor.close();
-        return totalExpense;
-    }
-
-
 
 
 }

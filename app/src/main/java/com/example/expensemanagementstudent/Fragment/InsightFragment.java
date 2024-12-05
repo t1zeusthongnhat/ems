@@ -1,33 +1,48 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.expensemanagementstudent.R;
-import com.github.mikephil.charting.charts.BarChart;
+import com.example.expensemanagementstudent.db.ExpenseDB;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class InsightFragment extends Fragment {
 
+    private PieChart pieChart, halfDonutChart;
+    private LinearLayout categoryOverviewLayout;
+    private ExpenseDB expenseDB;
+    private int userId; // Lấy userId động
+    private Spinner monthSpinner, yearSpinner;
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_insight, container, false);
     }
@@ -36,62 +51,217 @@ public class InsightFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // PieChart setup
-        PieChart pieChart = view.findViewById(R.id.pieChart);
+        // Kết nối PieChart, Spinner và Layout
+        pieChart = view.findViewById(R.id.pieChart);
+        halfDonutChart = view.findViewById(R.id.halfDonutChart);
+        monthSpinner = view.findViewById(R.id.monthSpinner);
+        yearSpinner = view.findViewById(R.id.yearSpinner);
+        categoryOverviewLayout = view.findViewById(R.id.categoryOverviewLayout);
+        expenseDB = new ExpenseDB(requireContext());
 
+        // Lấy userId từ SharedPreferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        userId = sharedPreferences.getInt("userId", -1);
+
+        // Kiểm tra nếu userId không có thì không làm gì thêm
+        if (userId == -1) {
+            // Xử lý userId invalid (ví dụ: show error)
+            return;
+        }
+
+        // Thiết lập Adapter cho Spinner
+        ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                getMonths()
+        );
+        monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        monthSpinner.setAdapter(monthAdapter);
+
+        ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                getYears()
+        );
+        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        yearSpinner.setAdapter(yearAdapter);
+
+        // Lắng nghe sự kiện chọn tháng và năm
+        AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedMonth = String.format("%02d", monthSpinner.getSelectedItemPosition() + 1); // Tháng dạng "01", "02", ...
+                String selectedYear = yearSpinner.getSelectedItem().toString();
+                updateChartAndOverview(selectedMonth, selectedYear, getMonths()[monthSpinner.getSelectedItemPosition()]);
+                updateHalfDonutChart(selectedMonth, selectedYear);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Không cần xử lý
+            }
+        };
+        monthSpinner.setOnItemSelectedListener(onItemSelectedListener);
+        yearSpinner.setOnItemSelectedListener(onItemSelectedListener);
+
+        // Khởi tạo dữ liệu cho tháng và năm đầu tiên
+        monthSpinner.setSelection(0); // Mặc định tháng 1
+        yearSpinner.setSelection(getCurrentYearPosition()); // Mặc định năm hiện tại
+    }
+
+    private void updateChartAndOverview(String month, String year, String monthName) {
+        // Cập nhật trung tâm biểu đồ
+        pieChart.setCenterText("Expenses for " + monthName + " " + year);
+        pieChart.setCenterTextSize(18f);
+        pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD);
+
+        // Lấy dữ liệu từ database
+        Cursor cursor = expenseDB.getExpenseByCategoryAndMonth(userId, month, year); // Truyền thêm tham số year
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
-        pieEntries.add(new PieEntry(50f, "Food"));
-        pieEntries.add(new PieEntry(30f, "Shopping"));
-        pieEntries.add(new PieEntry(70f, "Travelling"));
-        pieEntries.add(new PieEntry(40f, "Entertainment"));
-        pieEntries.add(new PieEntry(20f, "Medical"));
+        categoryOverviewLayout.removeAllViews(); // Xóa dữ liệu cũ
 
+        // Tiêu đề "Category Overview"
+        TextView overviewTitle = new TextView(requireContext());
+        overviewTitle.setText("Category Overview");
+        overviewTitle.setTextSize(16f);
+        overviewTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        overviewTitle.setTextColor(Color.BLACK);
+        overviewTitle.setPadding(0, 16, 0, 8);
+        categoryOverviewLayout.addView(overviewTitle);
+
+        if (cursor.moveToFirst()) {
+            float totalAmount = 0;
+            do {
+                totalAmount += cursor.getFloat(1); // Tính tổng số tiền
+            } while (cursor.moveToNext());
+
+            cursor.moveToFirst(); // Reset lại cursor để sử dụng lại
+
+            do {
+                String category = cursor.getString(0); // Cột tên danh mục
+                float amount = cursor.getFloat(1); // Cột tổng số tiền
+                float percentage = (amount / totalAmount) * 100; // Tính phần trăm
+
+                // Thêm dữ liệu vào PieChart
+                pieEntries.add(new PieEntry(percentage, category));
+
+                // Hiển thị danh mục và số tiền trong giao diện
+                LinearLayout itemLayout = new LinearLayout(requireContext());
+                itemLayout.setOrientation(LinearLayout.HORIZONTAL);
+                itemLayout.setPadding(0, 8, 0, 8);
+
+                TextView categoryText = new TextView(requireContext());
+                categoryText.setText(category);
+                categoryText.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+                categoryText.setTextSize(14f);
+                categoryText.setTextColor(Color.BLACK);
+
+                TextView amountText = new TextView(requireContext());
+                amountText.setText(formatCurrency(amount));
+                amountText.setTextSize(14f);
+                amountText.setTextColor(Color.BLACK);
+                amountText.setGravity(View.TEXT_ALIGNMENT_VIEW_END);
+
+                itemLayout.addView(categoryText);
+                itemLayout.addView(amountText);
+                categoryOverviewLayout.addView(itemLayout);
+            } while (cursor.moveToNext());
+        } else {
+            TextView emptyText = new TextView(requireContext());
+            emptyText.setText("No data available for this month.");
+            emptyText.setTextSize(14f);
+            emptyText.setTextColor(Color.GRAY);
+            categoryOverviewLayout.addView(emptyText);
+        }
+        cursor.close();
+
+        // Cập nhật PieChart
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
         pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
         pieDataSet.setValueTextSize(12f);
-        pieDataSet.setValueTextColor(android.graphics.Color.BLACK);
+        pieDataSet.setValueTextColor(Color.BLACK);
+        pieDataSet.setValueFormatter(new PercentFormatter(pieChart)); // Hiển thị phần trăm
 
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.setUsePercentValues(true);
-        pieChart.setCenterText("Expenses");
-        pieChart.setCenterTextSize(18f);
-        pieChart.setEntryLabelTextSize(12f);
-        pieChart.setEntryLabelColor(android.graphics.Color.BLACK);
+        pieChart.setDrawEntryLabels(false); // Ẩn nhãn trong biểu đồ
         pieChart.invalidate();
+    }
 
-        Legend pieLegend = pieChart.getLegend();
-        pieLegend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        pieLegend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+    private void updateHalfDonutChart(String month, String year) {
+        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 0);  // 0: income
+        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 1);  // 1: expense
 
-        // BarChart setup for income vs expense per month
-        BarChart barChart = view.findViewById(R.id.barChart);
+        float totalIncome = 0;
+        float totalExpense = 0;
 
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
-        for (int i = 0; i < 12; i++) {
-            float income = (float) (Math.random() * 5000); // Simulating random income
-            float expense = (float) (Math.random() * 4000); // Simulating random expense
-            barEntries.add(new BarEntry(i, new float[]{income, expense}));
+        if (cursorIncome.moveToFirst()) {
+            totalIncome = cursorIncome.getFloat(0);
+        }
+        if (cursorExpense.moveToFirst()) {
+            totalExpense = cursorExpense.getFloat(0);
         }
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Income vs Expense");
-        barDataSet.setColors(new int[]{android.graphics.Color.BLUE, android.graphics.Color.RED});
-        barDataSet.setValueTextSize(12f);
-        barDataSet.setValueTextColor(android.graphics.Color.BLACK);
+        cursorIncome.close();
+        cursorExpense.close();
 
-        BarData barData = new BarData(barDataSet);
-        barData.setBarWidth(0.35f);  // Adjust bar width
-        barChart.setData(barData);
-        barChart.getDescription().setEnabled(false);
-        barChart.animateY(1000);
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(totalIncome, "Income"));
+        entries.add(new PieEntry(totalExpense, "Expense"));
 
-        // Legend for BarChart
-        Legend barLegend = barChart.getLegend();
-        barLegend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        barLegend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        barLegend.setForm(Legend.LegendForm.CIRCLE);
-        barLegend.setTextColor(android.graphics.Color.BLACK);
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(Color.BLACK);
 
-        barChart.invalidate();
+        PieData data = new PieData(dataSet);
+        halfDonutChart.setData(data);
+
+        halfDonutChart.setUsePercentValues(false);
+        halfDonutChart.setDrawHoleEnabled(true);
+        halfDonutChart.setHoleRadius(50f);
+        halfDonutChart.setTransparentCircleRadius(55f);
+
+        // Customize to make it half donut
+        halfDonutChart.setMaxAngle(180f);  // HALF CHART
+        halfDonutChart.setRotationAngle(180f);
+        halfDonutChart.setCenterText("Income vs Expense");
+
+        halfDonutChart.invalidate(); // refresh
+    }
+
+    private String formatCurrency(float amount) {
+        // Định dạng số tiền với dấu phân cách hàng nghìn
+        NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
+        return formatter.format(amount);
+    }
+
+    private String[] getMonths() {
+        return new String[]{
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+        };
+    }
+
+    private String[] getYears() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        int startYear = currentYear - 10; // 10 năm trước
+        String[] years = new String[11];
+        for (int i = 0; i < years.length; i++) {
+            years[i] = String.valueOf(startYear + i);
+        }
+        return years;
+    }
+
+    private int getCurrentYearPosition() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        String[] years = getYears();
+        for (int i = 0; i < years.length; i++) {
+            if (years[i].equals(String.valueOf(currentYear))) {
+                return i;
+            }
+        }
+        return 0; // Mặc định là năm đầu tiên nếu không tìm thấy
     }
 }
