@@ -110,21 +110,19 @@ public class InsightFragment extends Fragment {
     }
 
     private void updateChartAndOverview(String month, String year, String monthName) {
-        // Cập nhật trung tâm biểu đồ
         pieChart.setCenterText("Expenses for " + monthName + " " + year);
         pieChart.setCenterTextSize(18f);
-        pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD);
+
 
         // Lấy dữ liệu từ database
-        Cursor cursor = expenseDB.getExpenseByCategoryAndMonth(userId, month, year); // Truyền thêm tham số year
+        Cursor cursor = expenseDB.getExpenseByCategoryAndMonth(userId, month, year);
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
+        ArrayList<Integer> colors = new ArrayList<>();
         categoryOverviewLayout.removeAllViews(); // Xóa dữ liệu cũ
 
         // Tiêu đề "Category Overview"
         TextView overviewTitle = new TextView(requireContext());
         overviewTitle.setText("Category Overview");
-        overviewTitle.setTextSize(16f);
-        overviewTitle.setTypeface(Typeface.DEFAULT_BOLD);
         overviewTitle.setTextColor(Color.BLACK);
         overviewTitle.setPadding(0, 16, 0, 8);
         categoryOverviewLayout.addView(overviewTitle);
@@ -132,23 +130,32 @@ public class InsightFragment extends Fragment {
         if (cursor.moveToFirst()) {
             float totalAmount = 0;
             do {
-                totalAmount += cursor.getFloat(1); // Tính tổng số tiền
+                totalAmount += cursor.getFloat(1);
             } while (cursor.moveToNext());
 
             cursor.moveToFirst(); // Reset lại cursor để sử dụng lại
 
+            int[] availableColors = ColorTemplate.MATERIAL_COLORS; // Danh sách màu mặc định
+            int colorIndex = 0;
+
             do {
-                String category = cursor.getString(0); // Cột tên danh mục
-                float amount = cursor.getFloat(1); // Cột tổng số tiền
-                float percentage = (amount / totalAmount) * 100; // Tính phần trăm
+                String category = cursor.getString(0);
+                float amount = cursor.getFloat(1);
+                float percentage = (amount / totalAmount) * 100;
 
                 // Thêm dữ liệu vào PieChart
                 pieEntries.add(new PieEntry(percentage, category));
+                colors.add(availableColors[colorIndex % availableColors.length]);
+                colorIndex++;
 
                 // Hiển thị danh mục và số tiền trong giao diện
                 LinearLayout itemLayout = new LinearLayout(requireContext());
                 itemLayout.setOrientation(LinearLayout.HORIZONTAL);
                 itemLayout.setPadding(0, 8, 0, 8);
+
+                View colorIndicator = new View(requireContext());
+                colorIndicator.setLayoutParams(new LinearLayout.LayoutParams(24, 24));
+                colorIndicator.setBackgroundColor(colors.get(colors.size() - 1)); // Màu tương ứng
 
                 TextView categoryText = new TextView(requireContext());
                 categoryText.setText(category);
@@ -162,6 +169,7 @@ public class InsightFragment extends Fragment {
                 amountText.setTextColor(Color.BLACK);
                 amountText.setGravity(View.TEXT_ALIGNMENT_VIEW_END);
 
+                itemLayout.addView(colorIndicator);
                 itemLayout.addView(categoryText);
                 itemLayout.addView(amountText);
                 categoryOverviewLayout.addView(itemLayout);
@@ -177,10 +185,10 @@ public class InsightFragment extends Fragment {
 
         // Cập nhật PieChart
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
-        pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        pieDataSet.setColors(colors);
         pieDataSet.setValueTextSize(12f);
         pieDataSet.setValueTextColor(Color.BLACK);
-        pieDataSet.setValueFormatter(new PercentFormatter(pieChart)); // Hiển thị phần trăm
+        pieDataSet.setValueFormatter(new PercentFormatter(pieChart));
 
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
@@ -188,6 +196,7 @@ public class InsightFragment extends Fragment {
         pieChart.setDrawEntryLabels(false); // Ẩn nhãn trong biểu đồ
         pieChart.invalidate();
     }
+
 
     private void updateHalfDonutChart(String month, String year) {
         Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 0);  // 0: income
@@ -229,7 +238,22 @@ public class InsightFragment extends Fragment {
         halfDonutChart.setCenterText("Income vs Expense");
 
         halfDonutChart.invalidate(); // refresh
+
+        // Add comment logic
+        TextView comparisonCommentText = requireView().findViewById(R.id.comparisonCommentText);
+        String comment;
+        if (totalIncome > totalExpense) {
+            float savings = totalIncome - totalExpense;
+            comment = "Great job! You saved " + formatCurrency(savings) + " this month.";
+        } else if (totalIncome == totalExpense) {
+            comment = "You broke even this month. Try to save more next time!";
+        } else {
+            float overspend = totalExpense - totalIncome;
+            comment = "Careful! You overspent by " + formatCurrency(overspend) + " this month.";
+        }
+        comparisonCommentText.setText(comment);
     }
+
 
     private String formatCurrency(float amount) {
         // Định dạng số tiền với dấu phân cách hàng nghìn
