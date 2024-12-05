@@ -1,6 +1,7 @@
 package com.example.expensemanagementstudent;
 
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -27,18 +28,28 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private TransactionAdapter adapter;
     private ArrayList<Transaction> transactions;
     private ExpenseDB expenseDB;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_history);
+
         ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> onBackPressed());
+
+        // Retrieve the logged-in user ID from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        userId = sharedPreferences.getInt("userId", -1);
+
+        if (userId == -1) {
+            // If no user is logged in, handle the error
+            finish(); // Close the activity
+            return;
+        }
+
         // Initialize views and components
         initializeComponents();
-        btnBack.setOnClickListener(v -> {
-            // Navigate back to the previous activity or close the current activity
-            onBackPressed();
-        });
     }
 
     /**
@@ -62,11 +73,11 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     /**
-     * Load transactions from the database.
+     * Load transactions for the logged-in user from the database.
      */
     private ArrayList<Transaction> loadTransactions() {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        Cursor cursor = expenseDB.getAllTransactions();
+        Cursor cursor = expenseDB.getTransactionsForUser(userId); // Fetch transactions for the specific user
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -127,12 +138,12 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     /**
-     * Load all categories from the database.
+     * Load all categories for the logged-in user.
      */
     private ArrayList<String> loadCategories() {
         ArrayList<String> categories = new ArrayList<>();
         categories.add("All"); // Add default "All" option
-        Cursor cursor = expenseDB.getAllTransactions(); // Replace with your category fetch logic
+        Cursor cursor = expenseDB.getTransactionsForUser(userId); // Fetch user-specific categories
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -148,23 +159,24 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     /**
-     * Apply filters and fetch the filtered transactions.
+     * Apply filters and fetch the filtered transactions for the logged-in user.
      */
     private ArrayList<Transaction> applyFilters(String type, String category) {
         ArrayList<Transaction> filteredTransactions = new ArrayList<>();
         Cursor cursor;
 
         if (type.equals("All") && category.equals("All")) {
-            cursor = expenseDB.getAllTransactions();
+            cursor = expenseDB.getTransactionsForUser(userId);
         } else if (!type.equals("All") && category.equals("All")) {
             int transactionType = type.equals("Income") ? 0 : 1;
-            cursor = expenseDB.getTransactionsByType(transactionType);
+            cursor = expenseDB.getFilteredTransactionsForUser(userId, transactionType, -1);
         } else if (type.equals("All") && !category.equals("All")) {
-            cursor = expenseDB.getTransactionsByCategory(category);
+            int categoryId = getCategoryId(category);
+            cursor = expenseDB.getFilteredTransactionsForUser(userId, -1, categoryId);
         } else {
             int transactionType = type.equals("Income") ? 0 : 1;
-            int categoryId = getCategoryId(category); // Implement getCategoryId logic
-            cursor = expenseDB.getFilteredTransactions(transactionType, categoryId);
+            int categoryId = getCategoryId(category);
+            cursor = expenseDB.getFilteredTransactionsForUser(userId, transactionType, categoryId);
         }
 
         if (cursor != null) {

@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class ExpenseDB {
 
     private SQLiteDatabase db;
@@ -115,13 +117,43 @@ public class ExpenseDB {
         return db.rawQuery(query, new String[]{String.valueOf(userId)});
     }
 
-    public Cursor getFilteredTransactions(int type, int categoryId) {
+    public Cursor getFilteredTransactionsForUser(int userId, int type, int categoryId) {
+        StringBuilder query = new StringBuilder();
+        ArrayList<String> args = new ArrayList<>();
+
+        query.append("SELECT e.*, c.name AS category_name ")
+                .append("FROM ").append(DatabaseHelper.EXPENSE_TABLE).append(" e ")
+                .append("INNER JOIN ").append(DatabaseHelper.CATEGORY_TABLE).append(" c ")
+                .append("ON e.").append(DatabaseHelper.EXPENSE_CATEGORY_ID_COL).append(" = c.").append(DatabaseHelper.CATEGORY_ID_COL)
+                .append(" WHERE e.").append(DatabaseHelper.EXPENSE_USER_ID_COL).append(" = ?");
+
+        args.add(String.valueOf(userId));
+
+        // Add condition for type if specified
+        if (type != -1) {
+            query.append(" AND e.").append(DatabaseHelper.TYPE_COL).append(" = ?");
+            args.add(String.valueOf(type));
+        }
+
+        // Add condition for categoryId if specified
+        if (categoryId != -1) {
+            query.append(" AND e.").append(DatabaseHelper.EXPENSE_CATEGORY_ID_COL).append(" = ?");
+            args.add(String.valueOf(categoryId));
+        }
+
+        query.append(" ORDER BY e.").append(DatabaseHelper.DATE_COL).append(" DESC");
+
+        return db.rawQuery(query.toString(), args.toArray(new String[0]));
+    }
+
+    public Cursor getTransactionsForUser(int userId) {
         String query = "SELECT e.*, c.name AS category_name " +
                 "FROM " + DatabaseHelper.EXPENSE_TABLE + " e " +
                 "INNER JOIN " + DatabaseHelper.CATEGORY_TABLE + " c " +
                 "ON e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = c." + DatabaseHelper.CATEGORY_ID_COL +
-                " WHERE e." + DatabaseHelper.TYPE_COL + " = ? AND e." + DatabaseHelper.EXPENSE_CATEGORY_ID_COL + " = ? " +
-                "ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
-        return db.rawQuery(query, new String[]{String.valueOf(type), String.valueOf(categoryId)});
+                " WHERE e." + DatabaseHelper.EXPENSE_USER_ID_COL + " = ?" +
+                " ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
+        return db.rawQuery(query, new String[]{String.valueOf(userId)});
     }
+
 }
