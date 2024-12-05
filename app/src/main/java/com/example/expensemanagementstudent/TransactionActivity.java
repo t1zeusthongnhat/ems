@@ -174,7 +174,7 @@ public class TransactionActivity extends AppCompatActivity {
                 String date = inputDate.getText().toString();
                 String notes = inputNotes.getText().toString();
 
-                int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 1 : 0;
+                int type = (toggleGroup.getCheckedButtonId() == R.id.btn_income) ? 0 : 1;
 
                 SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
                 int userId = sharedPreferences.getInt("userId", -1);
