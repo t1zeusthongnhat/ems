@@ -1,31 +1,35 @@
 package com.example.expensemanagementstudent;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Patterns;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+
 import com.example.expensemanagementstudent.db.UserDB;
 
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
-    TextView tvRegister;
     EditText edtUsername, edtEmail, edtAddress, edtPassword;
     Button btnRegister;
-
     UserDB userDB;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -34,7 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_activity_layout);
 
-        //nap view cho thong tin
+        // Khởi tạo view
         edtUsername = findViewById(R.id.edtUsername);
         edtEmail = findViewById(R.id.edtEmail);
         edtAddress = findViewById(R.id.editTextAddress);
@@ -43,25 +47,15 @@ public class RegisterActivity extends AppCompatActivity {
 
         userDB = new UserDB(RegisterActivity.this);
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                singupWithSQLite();
+        btnRegister.setOnClickListener(view -> registerUser());
 
-            }
+        findViewById(R.id.tvSignIn).setOnClickListener(view -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
 
-        tvRegister = findViewById(R.id.tvSignIn);
-        tvRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        // Add touch listener to the parent layout
+        // Ẩn bàn phím khi chạm ngoài EditText
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         ConstraintLayout parentLayout = findViewById(R.id.constraintLayout);
         parentLayout.setOnTouchListener((view, motionEvent) -> {
@@ -71,13 +65,13 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void singupWithSQLite() {
-        String user = edtUsername.getText().toString().trim();
-        String pass = edtPassword.getText().toString().trim();
+    private void registerUser() {
+        String username = edtUsername.getText().toString().trim();
+        String password = edtPassword.getText().toString().trim();
         String email = edtEmail.getText().toString().trim();
         String address = edtAddress.getText().toString().trim();
 
-        // Get selected gender from RadioGroup
+        // Lấy giới tính từ RadioGroup
         RadioGroup radioGroupGender = findViewById(R.id.radioGroupGender);
         int selectedGenderId = radioGroupGender.getCheckedRadioButtonId();
         String gender = "";
@@ -88,35 +82,108 @@ public class RegisterActivity extends AppCompatActivity {
             gender = "Female";
         }
 
-        // Validate input fields
-        if (TextUtils.isEmpty(user) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(email) ||
-                TextUtils.isEmpty(gender) || TextUtils.isEmpty(address)) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+        // Kiểm tra tính hợp lệ của đầu vào
+        if (!validateInput(username, password, email, address, gender)) return;
+
+        // Kiểm tra email đã tồn tại chưa
+        if (userDB.isEmailExists(email)) {
+            Toast.makeText(this, "This email is already registered!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (userDB.isUsernameExists(username)) {
+            Toast.makeText(this, "This username is already registered!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Add user data to SQLite
-        long insert = userDB.addNewAccountUser(user, pass, email, gender, address);
-        if (insert == -1) {
-            Toast.makeText(this, "Register failed", Toast.LENGTH_SHORT).show();
-        } else {
-            // Save user info in SharedPreferences after successful registration
-            SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("username", user);
-            editor.putString("address", address);
-            editor.putString("email", email);  // Optional: Store more info like email
-            editor.putBoolean("isLoggedIn", true); // Mark as logged in
-            editor.apply();
-
-            Toast.makeText(this, "Register successfully", Toast.LENGTH_SHORT).show();
+        try {
+            long result = userDB.addNewAccountUser(username, password, email, gender, address);
+            if (result != -1) {
+                Toast.makeText(this, "Register successfully!", Toast.LENGTH_SHORT).show();
+                // Chuyển về màn hình đăng nhập
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Register failed. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error during registration: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        // Redirect to login screen
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-        startActivity(intent);
     }
 
+
+    private boolean validateInput(String username, String password, String email, String address, String gender) {
+        // Kiểm tra username
+        if (TextUtils.isEmpty(username)) {
+            Toast.makeText(this, "Username cannot be empty.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (username.length() < 3 || username.length() > 20) {
+            Toast.makeText(this, "Username must be between 3 and 20 characters.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Kiểm tra mật khẩu
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!isPasswordLengthValid(password)) {
+            Toast.makeText(this, "Password must be at least 6 characters long.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!containsUppercase(password)) {
+            Toast.makeText(this, "Password must contain at least one uppercase letter.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!containsDigit(password)) {
+            Toast.makeText(this, "Password must contain at least one number.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!containsSpecialCharacter(password)) {
+            Toast.makeText(this, "Password must contain at least one special character.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Kiểm tra email
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Email cannot be empty.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Please enter a valid email address.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Kiểm tra địa chỉ
+        if (TextUtils.isEmpty(address)) {
+            Toast.makeText(this, "Address cannot be empty.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Kiểm tra giới tính
+        if (TextUtils.isEmpty(gender)) {
+            Toast.makeText(this, "Please select a gender.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isPasswordLengthValid(String password) {
+        return password.length() >= 6;
+    }
+
+    private boolean containsUppercase(String password) {
+        return Pattern.compile("[A-Z]").matcher(password).find();
+    }
+
+    private boolean containsDigit(String password) {
+        return Pattern.compile("\\d").matcher(password).find();
+    }
+
+    private boolean containsSpecialCharacter(String password) {
+        return Pattern.compile("[@#$%^&+=!]").matcher(password).find();
+    }
 
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

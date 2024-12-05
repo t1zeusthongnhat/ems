@@ -25,7 +25,6 @@
         <activity android:name=".onboarding.ContainerActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordActivity" android:exported="true"/>
         <activity android:name=".ResetPasswordActivity" android:exported="true"/>
-        <activity android:name=".NotificationListActivity" android:exported="true"/>
         <activity
             android:name=".TransactionActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
