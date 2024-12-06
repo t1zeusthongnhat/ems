@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.expensemanagementstudent.adapter.TransactionAdapter;
+import com.example.expensemanagementstudent.adapter.TransactionAdapterOv;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
 import com.example.expensemanagementstudent.db.ExpenseDB;
 import com.example.expensemanagementstudent.model.Transaction;
@@ -25,7 +25,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
 
     private RecyclerView recyclerView;
-    private TransactionAdapter adapter;
+    private TransactionAdapterOv adapter;
     private ArrayList<Transaction> transactions;
     private ExpenseDB expenseDB;
     private int userId;
@@ -65,7 +65,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
         // Load transactions and set adapter
         transactions = loadTransactions();
-        adapter = new TransactionAdapter(this, transactions);
+        adapter = new TransactionAdapterOv(this, transactions);
         recyclerView.setAdapter(adapter);
 
         // Set filter button click listener

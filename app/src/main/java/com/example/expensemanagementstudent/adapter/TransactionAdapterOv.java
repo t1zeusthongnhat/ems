@@ -15,11 +15,11 @@ import com.example.expensemanagementstudent.model.Transaction;
 
 import java.util.ArrayList;
 
-public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
+public class TransactionAdapterOv extends RecyclerView.Adapter<TransactionAdapterOv.TransactionViewHolder> {
     private Context context;
     private ArrayList<Transaction> transactions;
 
-    public TransactionAdapter(Context context, ArrayList<Transaction> transactions) {
+    public TransactionAdapterOv(Context context, ArrayList<Transaction> transactions) {
         this.context = context;
         this.transactions = transactions;
     }
