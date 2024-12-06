@@ -105,7 +105,7 @@ public class InsightFragment extends Fragment {
         yearSpinner.setOnItemSelectedListener(onItemSelectedListener);
 
         // Khởi tạo dữ liệu cho tháng và năm đầu tiên
-        monthSpinner.setSelection(0); // Mặc định tháng 1
+        monthSpinner.setSelection(11); // Mặc định tháng 1
         yearSpinner.setSelection(getCurrentYearPosition()); // Mặc định năm hiện tại
     }
 
@@ -199,8 +199,8 @@ public class InsightFragment extends Fragment {
 
 
     private void updateHalfDonutChart(String month, String year) {
-        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 0);  // 0: income
-        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 1);  // 1: expense
+        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 1);  // 0: income
+        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 0);  // 1: expense
 
         float totalIncome = 0;
         float totalExpense = 0;

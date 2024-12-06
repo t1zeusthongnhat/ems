@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp"
-                android:text="₹500 less than last month"
+                android:text="$500 less than last month"
                 android:textColor="#DDDDDD"
                 android:textSize="12sp" />
 
@@ -183,7 +183,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="$"
+                            android:text="1000$"
                             android:textColor="#4CAF50"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -227,7 +227,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="$"
+                            android:text="500$"
                             android:textColor="#F44336"
                             android:textSize="14sp"
                             android:textStyle="bold" />
