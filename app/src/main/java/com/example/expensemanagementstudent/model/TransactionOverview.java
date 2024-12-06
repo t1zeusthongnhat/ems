@@ -1,13 +1,13 @@
 package com.example.expensemanagementstudent.model;
 
-public class Transaction {
+public class TransactionOverview {
     private String date;
     private String category;
     private String formattedAmount;
     private int type; // 1 for expense, 0 for income
 
     // Constructor
-    public Transaction(String date, String category, String formattedAmount, int type) {
+    public TransactionOverview(String date, String category, String formattedAmount, int type) {
         this.date = date;
         this.category = category;
         this.formattedAmount = formattedAmount;

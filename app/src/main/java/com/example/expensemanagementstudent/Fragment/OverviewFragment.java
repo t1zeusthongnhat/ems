@@ -2,7 +2,6 @@ package com.example.expensemanagementstudent.Fragment;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -167,7 +166,7 @@ public class OverviewFragment extends Fragment {
     }
 
     private void addTransactionItem(String category, String description, double amount, int type, String date) {
-        View transactionItem = LayoutInflater.from(getContext()).inflate(R.layout.transaction_item, transactionListContainer, false);
+        View transactionItem = LayoutInflater.from(getContext()).inflate(R.layout.transaction_item_overview, transactionListContainer, false);
 
         TextView categoryView = transactionItem.findViewById(R.id.transaction_category);
         TextView descriptionView = transactionItem.findViewById(R.id.transaction_description);

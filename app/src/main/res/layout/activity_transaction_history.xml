@@ -57,5 +57,5 @@
         android:paddingVertical="8dp"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/transaction_item" />
+        tools:listitem="@layout/transaction_item_overview" />
 </LinearLayout>

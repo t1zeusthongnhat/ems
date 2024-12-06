@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.expensemanagementstudent.adapter.TransactionAdapterOv;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
 import com.example.expensemanagementstudent.db.ExpenseDB;
-import com.example.expensemanagementstudent.model.Transaction;
+import com.example.expensemanagementstudent.model.TransactionOverview;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private TransactionAdapterOv adapter;
-    private ArrayList<Transaction> transactions;
+    private ArrayList<TransactionOverview> transactionOverviews;
     private ExpenseDB expenseDB;
     private int userId;
 
@@ -63,9 +63,9 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Load transactions and set adapter
-        transactions = loadTransactions();
-        adapter = new TransactionAdapterOv(this, transactions);
+        // Load transactionOverviews and set adapter
+        transactionOverviews = loadTransactions();
+        adapter = new TransactionAdapterOv(this, transactionOverviews);
         recyclerView.setAdapter(adapter);
 
         // Set filter button click listener
@@ -73,11 +73,11 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     /**
-     * Load transactions for the logged-in user from the database.
+     * Load transactionOverviews for the logged-in user from the database.
      */
-    private ArrayList<Transaction> loadTransactions() {
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Cursor cursor = expenseDB.getTransactionsForUser(userId); // Fetch transactions for the specific user
+    private ArrayList<TransactionOverview> loadTransactions() {
+        ArrayList<TransactionOverview> transactionOverviews = new ArrayList<>();
+        Cursor cursor = expenseDB.getTransactionsForUser(userId); // Fetch transactionOverviews for the specific user
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -90,16 +90,16 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                 String formattedAmount = String.format("%,.2f $", amount);
 
                 // Add transaction to the list
-                transactions.add(new Transaction(date, category, formattedAmount, type));
+                transactionOverviews.add(new TransactionOverview(date, category, formattedAmount, type));
             }
             cursor.close();
         }
 
-        return transactions;
+        return transactionOverviews;
     }
 
     /**
-     * Open the filter dialog to filter transactions.
+     * Open the filter dialog to filter transactionOverviews.
      */
     private void openFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -129,8 +129,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             String selectedCategory = categorySpinner.getSelectedItem().toString();
 
             // Apply filters and update RecyclerView
-            ArrayList<Transaction> filteredTransactions = applyFilters(selectedType, selectedCategory);
-            adapter.updateTransactions(filteredTransactions);
+            ArrayList<TransactionOverview> filteredTransactionOverviews = applyFilters(selectedType, selectedCategory);
+            adapter.updateTransactions(filteredTransactionOverviews);
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
@@ -159,10 +159,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     /**
-     * Apply filters and fetch the filtered transactions for the logged-in user.
+     * Apply filters and fetch the filtered transactionOverviews for the logged-in user.
      */
-    private ArrayList<Transaction> applyFilters(String type, String category) {
-        ArrayList<Transaction> filteredTransactions = new ArrayList<>();
+    private ArrayList<TransactionOverview> applyFilters(String type, String category) {
+        ArrayList<TransactionOverview> filteredTransactionOverviews = new ArrayList<>();
         Cursor cursor;
 
         if (type.equals("All") && category.equals("All")) {
@@ -186,12 +186,12 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                 double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.AMOUNT_COL));
                 int transactionType = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.TYPE_COL));
 
-                filteredTransactions.add(new Transaction(date, transactionCategory, String.format("%,.2f $", amount), transactionType));
+                filteredTransactionOverviews.add(new TransactionOverview(date, transactionCategory, String.format("%,.2f $", amount), transactionType));
             }
             cursor.close();
         }
 
-        return filteredTransactions;
+        return filteredTransactionOverviews;
     }
 
     /**
