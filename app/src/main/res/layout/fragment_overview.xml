@@ -420,5 +420,19 @@
 
         </LinearLayout>
 
+    <LinearLayout
+    android:id="@+id/notificationLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:layout_gravity="top|end"
+    android:layout_marginTop="56dp"
+    android:layout_marginEnd="16dp">
+
+    <include layout="@layout/notification_layout" />
+</LinearLayout>
+
+
+
     </LinearLayout>
 </FrameLayout>
