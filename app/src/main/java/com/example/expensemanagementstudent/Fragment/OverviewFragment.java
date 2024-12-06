@@ -1,23 +1,24 @@
 package com.example.expensemanagementstudent.Fragment;
-
 import static android.app.Activity.RESULT_OK;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
-
-import com.example.expensemanagementstudent.CategoryActivity;
+import com.example.expensemanagementstudent.TransactionHistoryActivity;
+import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
 import com.example.expensemanagementstudent.R;
 import com.example.expensemanagementstudent.TransactionHistoryActivity;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
@@ -35,6 +36,7 @@ public class OverviewFragment extends Fragment {
     private Calendar calendar;
     private LinearLayout transactionListContainer;
     private ExpenseDB expenseDB;
+    private LinearLayout notificationLayout;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -70,18 +72,21 @@ public class OverviewFragment extends Fragment {
 
         TextView greetingText = rootView.findViewById(R.id.greetingText);
         TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
-
         // Initialize the database
         expenseDB = new ExpenseDB(requireContext());
 
         // Initialize the transaction list container
         transactionListContainer = rootView.findViewById(R.id.transaction_list_container);
-
-        // Add intent to navigate to CategoryActivity
-        btnAddCategory.setOnClickListener(view -> {
-            Intent intent = new Intent(getContext(), CategoryActivity.class);
-            startActivity(intent);
+        // Thêm Intent chuyển đến CategoryActivity
+        btnAddCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Chuyển đến CategoryActivity
+                Intent intent = new Intent(getContext(), CategoryActivity.class);
+                startActivity(intent);
+            }
         });
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
@@ -96,30 +101,60 @@ public class OverviewFragment extends Fragment {
         calendar = Calendar.getInstance();
         updateMonthYearDisplay();
 
-        previousMonth.setOnClickListener(v -> {
-            calendar.add(Calendar.MONTH, -1);
-            updateMonthYearDisplay();
+        previousMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.MONTH, -1);
+                updateMonthYearDisplay();
+            }
         });
-        nextMonth.setOnClickListener(v -> {
-            calendar.add(Calendar.MONTH, 1);
-            updateMonthYearDisplay();
+        nextMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.MONTH, 1);
+                updateMonthYearDisplay();
+            }
         });
 
-        seeAllButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
-            startActivityForResult(intent, 1);
+        seeAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
+                startActivity(intent);
+            }
         });
 
         // Load transactions dynamically into the container
         loadTransactions();
 
+        ImageView notificationIcon = rootView.findViewById(R.id.notificationIcon);
+        notificationLayout = rootView.findViewById(R.id.notificationLayout);
+
+        notificationIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleNotification();
+            }
+        });
+
         return rootView;
     }
 
     private void updateMonthYearDisplay() {
+        // Force the locale to English
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.ENGLISH);
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
+    }
+
+    private void toggleNotification() {
+        if (notificationLayout.getVisibility() == View.GONE) {
+            notificationLayout.setVisibility(View.VISIBLE);
+            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_down));
+        } else {
+            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_up));
+            notificationLayout.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -188,5 +223,4 @@ public class OverviewFragment extends Fragment {
 
         transactionListContainer.addView(transactionItem);
     }
-
 }

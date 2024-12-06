@@ -14,6 +14,8 @@ public class SplashActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Runnable runnable;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
