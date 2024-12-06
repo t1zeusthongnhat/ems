@@ -6,42 +6,40 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.expensemanagementstudent.R;
-import com.example.expensemanagementstudent.model.Transaction;
+import com.example.expensemanagementstudent.model.TransactionOV;
 
 import java.util.ArrayList;
 
-public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
+public class TransactionAdapterOverview extends RecyclerView.Adapter<TransactionAdapterOverview.TransactionViewHolder> {
     private Context context;
-    private ArrayList<Transaction> transactions;
+    private ArrayList<TransactionOV> transactionOVS;
 
-    public TransactionAdapter(Context context, ArrayList<Transaction> transactions) {
+    public TransactionAdapterOverview(Context context, ArrayList<TransactionOV> transactionOVS) {
         this.context = context;
-        this.transactions = transactions;
+        this.transactionOVS = transactionOVS;
     }
 
     @NonNull
     @Override
     public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.transaction_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.transaction_item_ov, parent, false);
         return new TransactionViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction transaction = transactions.get(position);
+        TransactionOV transactionOV = transactionOVS.get(position);
 
-        // Set transaction details
-        holder.category.setText(transaction.getCategory());
-        holder.date.setText(transaction.getDate());
-        holder.amount.setText(transaction.getFormattedAmount());
+        // Set transactionOV details
+        holder.category.setText(transactionOV.getCategory());
+        holder.date.setText(transactionOV.getDate());
+        holder.amount.setText(transactionOV.getFormattedAmount());
 
-        // Set the icon and text color based on the transaction type
-        if (transaction.getType() == 0) { // Expense
+        // Set the icon and text color based on the transactionOV type
+        if (transactionOV.getType() == 0) { // Expense
             holder.icon.setImageResource(R.drawable.ic_minus); // Replace with your minus icon
             holder.amount.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         } else { // Income
@@ -53,14 +51,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public int getItemCount() {
-        return transactions.size();
+        return transactionOVS.size();
     }
 
     /**
-     * Updates the transactions list and refreshes the RecyclerView.
+     * Updates the transactionOVS list and refreshes the RecyclerView.
      */
-    public void updateTransactions(ArrayList<Transaction> newTransactions) {
-        this.transactions = newTransactions;
+    public void updateTransactions(ArrayList<TransactionOV> newTransactionOVS) {
+        this.transactionOVS = newTransactionOVS;
         notifyDataSetChanged();
     }
 
