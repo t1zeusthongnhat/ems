@@ -183,7 +183,7 @@
             android:layout_marginHorizontal="15dp"
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/button_main"
-            android:text="Add transaction"
+            android:text="Add transactionOverview"
             android:textColor="@color/white" />
     </LinearLayout>
 </ScrollView>

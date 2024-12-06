@@ -1,10 +1,16 @@
 package com.example.expensemanagementstudent.Fragment;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +21,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-
-import com.example.expensemanagementstudent.AllTransactionsActivity;
+import com.example.expensemanagementstudent.TransactionHistoryActivity;
 import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
 import com.example.expensemanagementstudent.R;
+import com.example.expensemanagementstudent.TransactionHistoryActivity;
+import com.example.expensemanagementstudent.db.DatabaseHelper;
+import com.example.expensemanagementstudent.db.ExpenseDB;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,6 +39,8 @@ public class OverviewFragment extends Fragment {
     private TextView monthYearDisplay;
     private Calendar calendar;
     private LinearLayout notificationLayout;
+    private LinearLayout transactionListContainer;
+    private ExpenseDB expenseDB;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -66,7 +78,11 @@ public class OverviewFragment extends Fragment {
         TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
+        // Initialize the database
+        expenseDB = new ExpenseDB(requireContext());
 
+        // Initialize the transaction list container
+        transactionListContainer = rootView.findViewById(R.id.transaction_list_container);
         // Thêm Intent chuyển đến CategoryActivity
         btnAddCategory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,20 +123,13 @@ public class OverviewFragment extends Fragment {
         seeAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), AllTransactionsActivity.class);
+                Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
                 startActivity(intent);
             }
         });
 
-        ImageView notificationIcon = rootView.findViewById(R.id.notificationIcon);
-        notificationLayout = rootView.findViewById(R.id.notificationLayout);
-
-        notificationIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleNotification();
-            }
-        });
+        // Load transactions dynamically into the container
+        loadTransactions();
 
         return rootView;
     }
@@ -131,7 +140,6 @@ public class OverviewFragment extends Fragment {
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
     }
-
     private void toggleNotification() {
         if (notificationLayout.getVisibility() == View.GONE) {
             notificationLayout.setVisibility(View.VISIBLE);
@@ -140,6 +148,72 @@ public class OverviewFragment extends Fragment {
             notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_up));
             notificationLayout.setVisibility(View.GONE);
         }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadTransactions(); // Reload the transactions when the fragment is resumed
+    }
+
+    private void loadTransactions() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+        if (userId == -1) {
+            Toast.makeText(getContext(), "User ID not found. Please log in again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        transactionListContainer.removeAllViews(); // Clear previous transactions
+        Cursor cursor = expenseDB.getTransactionsByUserId(userId);
+        int limit = 2; // Show only two newest transactions
+        int count = 0;
+
+        if (cursor != null) {
+            while (cursor.moveToNext() && count < limit) {
+                String category = cursor.getString(cursor.getColumnIndex("category_name"));
+                String description = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DESCRIPTION_COL));
+                double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.AMOUNT_COL));
+                int type = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.TYPE_COL));
+                String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DATE_COL));
+
+                addTransactionItem(category, description, amount, type, date);
+                count++;
+            }
+            cursor.close();
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            loadTransactions(); // Reload transactions after adding a new one
+        }
+    }
+
+    private void addTransactionItem(String category, String description, double amount, int type, String date) {
+        View transactionItem = LayoutInflater.from(getContext()).inflate(R.layout.transaction_item_overview, transactionListContainer, false);
+
+        TextView categoryView = transactionItem.findViewById(R.id.transaction_category);
+        TextView descriptionView = transactionItem.findViewById(R.id.transaction_description);
+        TextView amountView = transactionItem.findViewById(R.id.transaction_amount);
+        TextView dateView = transactionItem.findViewById(R.id.transaction_date);
+
+        categoryView.setText(category);
+        descriptionView.setText(description);
+        dateView.setText(date);
+
+        // Format the amount with a "+" or "-" and apply color based on type
+        if (type == 1) { // Income
+            amountView.setText(String.format("+ %, .2f $", amount));
+            amountView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        } else { // Expense
+            amountView.setText(String.format("- %, .2f $", amount));
+            amountView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        }
+
+        transactionListContainer.addView(transactionItem);
     }
 
 }
