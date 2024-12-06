@@ -20,6 +20,7 @@
             android:exported="true" />
         <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".TransactionHistoryActivity" android:exported="true"/>
+        <activity android:name=".EditTransactionActivity" android:exported="true"/>
 
         <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>

@@ -1,6 +1,7 @@
 package com.example.expensemanagementstudent;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 
 public class TransactionHistoryActivity extends AppCompatActivity {
 
-
+    public static final int EDIT_TRANSACTION_REQUEST_CODE = 1;
     private RecyclerView recyclerView;
     private TransactionAdapterOv adapter;
     private ArrayList<TransactionOverview> transactionOverviews;
@@ -77,26 +78,28 @@ public class TransactionHistoryActivity extends AppCompatActivity {
      */
     private ArrayList<TransactionOverview> loadTransactions() {
         ArrayList<TransactionOverview> transactionOverviews = new ArrayList<>();
-        Cursor cursor = expenseDB.getTransactionsForUser(userId); // Fetch transactionOverviews for the specific user
+        Cursor cursor = expenseDB.getTransactionsForUser(userId);
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.EXPENSE_ID_COL));
                 String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DATE_COL));
                 String category = cursor.getString(cursor.getColumnIndex("category_name"));
                 double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.AMOUNT_COL));
                 int type = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.TYPE_COL));
+                String description = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DESCRIPTION_COL)); // Fetch description
 
-                // Format amount as currency
                 String formattedAmount = String.format("%,.2f $", amount);
 
-                // Add transaction to the list
-                transactionOverviews.add(new TransactionOverview(date, category, formattedAmount, type));
+                transactionOverviews.add(new TransactionOverview(id, date, category, formattedAmount, description, type));
             }
             cursor.close();
         }
 
         return transactionOverviews;
     }
+
+
 
     /**
      * Open the filter dialog to filter transactionOverviews.
@@ -157,6 +160,17 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
         return categories;
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EDIT_TRANSACTION_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Reload the transactions from the database and refresh the RecyclerView
+            transactionOverviews.clear();
+            transactionOverviews.addAll(loadTransactions());
+            adapter.notifyDataSetChanged();
+        }
+    }
 
     /**
      * Apply filters and fetch the filtered transactionOverviews for the logged-in user.
@@ -168,31 +182,37 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         if (type.equals("All") && category.equals("All")) {
             cursor = expenseDB.getTransactionsForUser(userId);
         } else if (!type.equals("All") && category.equals("All")) {
-            int transactionType = type.equals("Income") ? 0 : 1;
+            int transactionType = type.equals("Income") ? 1 : 0;
             cursor = expenseDB.getFilteredTransactionsForUser(userId, transactionType, -1);
         } else if (type.equals("All") && !category.equals("All")) {
             int categoryId = getCategoryId(category);
             cursor = expenseDB.getFilteredTransactionsForUser(userId, -1, categoryId);
         } else {
-            int transactionType = type.equals("Income") ? 0 : 1;
+            int transactionType = type.equals("Income") ? 1 : 0;
             int categoryId = getCategoryId(category);
             cursor = expenseDB.getFilteredTransactionsForUser(userId, transactionType, categoryId);
         }
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
+                int transactionId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.EXPENSE_ID_COL));
                 String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DATE_COL));
                 String transactionCategory = cursor.getString(cursor.getColumnIndex("category_name"));
                 double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.AMOUNT_COL));
                 int transactionType = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.TYPE_COL));
+                String description = cursor.getString(cursor.getColumnIndex(DatabaseHelper.DESCRIPTION_COL)); // Fetch description
 
-                filteredTransactionOverviews.add(new TransactionOverview(date, transactionCategory, String.format("%,.2f $", amount), transactionType));
+                String formattedAmount = String.format("%,.2f $", amount);
+
+                filteredTransactionOverviews.add(new TransactionOverview(transactionId, date, transactionCategory, formattedAmount, description, transactionType));
             }
             cursor.close();
         }
 
         return filteredTransactionOverviews;
     }
+
+
 
     /**
      * Get the category ID from the category name.
@@ -210,4 +230,10 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         cursor.close();
         return categoryId;
     }
+    private void reloadTransactions() {
+        transactionOverviews.clear();
+        transactionOverviews.addAll(loadTransactions()); // Reload transactions from the database
+        adapter.notifyDataSetChanged();
+    }
+
 }
