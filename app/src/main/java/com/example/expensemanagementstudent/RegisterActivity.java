@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -98,6 +99,15 @@ public class RegisterActivity extends AppCompatActivity {
         try {
             long result = userDB.addNewAccountUser(username, password, email, gender, address);
             if (result != -1) {
+                // Save user info in SharedPreferences after successful registration
+                SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("username", username);
+                editor.putString("email", email);  // Optional: Store more info like email
+                editor.putString("address", address);
+                editor.putString("gender", gender);
+                editor.putBoolean("isLoggedIn", true); // Mark as logged in
+                editor.apply();
                 Toast.makeText(this, "Register successfully!", Toast.LENGTH_SHORT).show();
                 // Chuyển về màn hình đăng nhập
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);

@@ -56,12 +56,15 @@
         android:padding="20dp"
         >
 
-        <TextView
+        <EditText
             android:id="@+id/emailAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Email ID"
             android:drawablePadding="8dp"
+            android:enabled="false"
+            android:background="@null"
+
             />
     </LinearLayout>
 
@@ -76,14 +79,35 @@
 
         >
 
-        <TextView
+        <EditText
             android:id="@+id/tvAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Phone Number"
+            android:enabled="false"
+            android:background="@null"
+
             android:drawablePadding="8dp"/>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="left"
+        android:layout_marginTop="10dp"
+        android:padding="20dp"
+        >
 
+        <EditText
+            android:id="@+id/tvGender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Phone Number"
+            android:enabled="false"
+            android:background="@null"
+
+            android:drawablePadding="8dp"/>
+    </LinearLayout>
     <!-- Logout Button (Styled with Red Color) -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -91,10 +115,10 @@
         android:gravity="center"
         android:layout_marginTop="20dp">
         <Button
-            android:id="@+id/saveChangesButton"
+            android:id="@+id/btnEditProfile"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="Save Changes"
+            android:text="Edit Profile"
             android:backgroundTint="@android:color/holo_blue_bright"
             android:textColor="@color/white"
             android:padding="14dp" />
