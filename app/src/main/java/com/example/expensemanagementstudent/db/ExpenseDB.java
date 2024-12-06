@@ -168,5 +168,31 @@ public class ExpenseDB {
                 " ORDER BY e." + DatabaseHelper.DATE_COL + " DESC";
         return db.rawQuery(query, new String[]{String.valueOf(userId)});
     }
+    public boolean updateTransaction(int transactionId, double amount, String description, String date, int categoryId, int type) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.AMOUNT_COL, amount);
+        values.put(DatabaseHelper.DESCRIPTION_COL, description);
+        values.put(DatabaseHelper.DATE_COL, date);
+        values.put(DatabaseHelper.EXPENSE_CATEGORY_ID_COL, categoryId);
+        values.put(DatabaseHelper.TYPE_COL, type);
+
+        return db.update(
+                DatabaseHelper.EXPENSE_TABLE,
+                values,
+                DatabaseHelper.EXPENSE_ID_COL + " = ?",
+                new String[]{String.valueOf(transactionId)}
+        ) > 0;
+    }
+    public Cursor getTransactionById(int transactionId) {
+        String query = "SELECT * FROM " + DatabaseHelper.EXPENSE_TABLE +
+                " WHERE " + DatabaseHelper.EXPENSE_ID_COL + " = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(transactionId)});
+    }
+    public boolean deleteTransaction(int transactionId) {
+        int rowsDeleted = db.delete(DatabaseHelper.EXPENSE_TABLE,
+                DatabaseHelper.EXPENSE_ID_COL + " = ?",
+                new String[]{String.valueOf(transactionId)});
+        return rowsDeleted > 0; // Return true if a row was deleted
+    }
 
 }

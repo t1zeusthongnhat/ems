@@ -200,6 +200,14 @@ public class OverviewFragment extends Fragment {
         TextView amountView = transactionItem.findViewById(R.id.transaction_amount);
         TextView dateView = transactionItem.findViewById(R.id.transaction_date);
 
+        // Find the Edit and Delete buttons
+        View editButton = transactionItem.findViewById(R.id.btn_edit_transaction);
+        View deleteButton = transactionItem.findViewById(R.id.btn_delete_transaction);
+
+        // Hide the buttons
+        editButton.setVisibility(View.GONE);
+        deleteButton.setVisibility(View.GONE);
+
         categoryView.setText(category);
         descriptionView.setText(description);
         dateView.setText(date);
@@ -215,5 +223,6 @@ public class OverviewFragment extends Fragment {
 
         transactionListContainer.addView(transactionItem);
     }
+
 
 }
