@@ -88,5 +88,30 @@ public class UserDB {
             return "USER_NOT_FOUND";
         }
     }
+    public boolean isEmailExists(String email) {
+        String query = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.EMAIL_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+    public boolean isUsernameExists(String username) {
+        String query = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USERNAME_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{username});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+
+    public boolean resetPassword(String email, String newPassword) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.PASS_COL, newPassword);
+
+        int rowsAffected = db.update(DatabaseHelper.USER_TABLE, values,
+                DatabaseHelper.EMAIL_COL + " = ?",
+                new String[]{email});
+        return rowsAffected > 0;
+    }
+
 
 }

@@ -72,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         });
     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void singupWithSQLite() {
         String user = edtUsername.getText().toString().trim();
@@ -91,55 +92,16 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Validate input fields
-        if (TextUtils.isEmpty(user)) {
-            showMessage("Username is required.");
-            return;
-        }
-
-        if (userDB.isUsernameExists(user)) {
-            showMessage("This username is already taken. Please choose another username.");
-            return;
-        }
-
-        if (TextUtils.isEmpty(email)) {
-            showMessage("Email is required.");
-            return;
-        }
-
-        if (!isValidEmail(email)) {
-            showMessage("Invalid email format. Please provide a valid email address.");
-            return;
-        }
-
-        if (userDB.isEmailExists(email)) {
-            showMessage("This email is already registered. Please use another email.");
-            return;
-        }
-
-        if (TextUtils.isEmpty(pass)) {
-            showMessage("Password is required.");
-            return;
-        }
-
-        // Validate password with detailed error messages
-        if (!validatePassword(pass)) {
-            return;
-        }
-
-        if (TextUtils.isEmpty(gender)) {
-            showMessage("Please select your gender.");
-            return;
-        }
-
-        if (TextUtils.isEmpty(address)) {
-            showMessage("Address is required.");
+        if (TextUtils.isEmpty(user) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(email) ||
+                TextUtils.isEmpty(gender) || TextUtils.isEmpty(address)) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Add user data to SQLite
         long insert = userDB.addNewAccountUser(user, pass, email, gender, address);
         if (insert == -1) {
-            showMessage("Registration failed. Please try again.");
+            Toast.makeText(this, "Register failed", Toast.LENGTH_SHORT).show();
         } else {
             // Save user info in SharedPreferences after successful registration
             SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
@@ -150,48 +112,14 @@ public class RegisterActivity extends AppCompatActivity {
             editor.putBoolean("isLoggedIn", true); // Mark as logged in
             editor.apply();
 
-            showMessage("Registration successful!");
-            // Redirect to login screen
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+            Toast.makeText(this, "Register successfully", Toast.LENGTH_SHORT).show();
         }
+
+        // Redirect to login screen
+        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
-    // Helper function to validate password and show specific error messages
-    private boolean validatePassword(String password) {
-        if (password.length() < 6) {
-            showMessage("Password must be at least 6 characters long.");
-            return false;
-        }
-        if (!password.matches(".*[A-Z].*")) {
-            showMessage("Password must contain at least one uppercase letter.");
-            return false;
-        }
-        if (!password.matches(".*[a-z].*")) {
-            showMessage("Password must contain at least one lowercase letter.");
-            return false;
-        }
-        if (!password.matches(".*\\d.*")) {
-            showMessage("Password must contain at least one number.");
-            return false;
-        }
-        if (!password.matches(".*[@#$%^&+=!].*")) {
-            showMessage("Password must contain at least one special character (@#$%^&+=!).");
-            return false;
-        }
-        return true;
-    }
-
-    // Helper function to check if email is valid
-    private boolean isValidEmail(String email) {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    // Helper function to display messages as Toast
-    private void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
 
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
