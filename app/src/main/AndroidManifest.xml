@@ -20,14 +20,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
-
         <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>
         <activity android:name=".onboarding.ContainerActivity" android:exported="true" />
-        <activity android:name=".ForgotPasswordActivity" android:exported="true"/>
-        <activity android:name=".ResetPasswordActivity" android:exported="true"/>
         <activity
             android:name=".TransactionActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
