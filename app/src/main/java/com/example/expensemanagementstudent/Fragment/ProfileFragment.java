@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +27,9 @@ import com.example.expensemanagementstudent.db.UserDB;
 
 public class ProfileFragment extends Fragment {
     private TextView profileName;
-    private TextView tvAddress;
-    private TextView emailAddress;
+    private EditText tvAddress;
+    private EditText emailAddress;
+    private EditText tvGender;
     private Button logoutButton;
     private UserDB userDB;
 private static final int PICK_IMAGE_REQUEST = 1;
@@ -44,8 +46,8 @@ private static final int PICK_IMAGE_REQUEST = 1;
         emailAddress = view.findViewById(R.id.tvAddress);
         logoutButton = view.findViewById(R.id.logoutButton);
         profileImage = view.findViewById(R.id.profileImage);
-
-        Button saveChangesButton = view.findViewById(R.id.saveChangesButton);
+        tvGender = view.findViewById(R.id.tvGender);
+        Button editProfileButton = view.findViewById(R.id.btnEditProfile);
         // Retrieve user information from SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
 
@@ -53,6 +55,7 @@ private static final int PICK_IMAGE_REQUEST = 1;
         String username = sharedPreferences.getString("username", "Username");
         String email = sharedPreferences.getString("email", "Not Provided");
         String address = sharedPreferences.getString("address", "Not Provided");
+        String gender = sharedPreferences.getString("gender", "Not provided");
         // Load saved image URI
         SharedPreferences sharedPreferencess = requireActivity().getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE);
         String savedImageUri = sharedPreferencess.getString("profileImageUri", null);
@@ -83,7 +86,9 @@ private static final int PICK_IMAGE_REQUEST = 1;
         profileName.setText(username);
         emailAddress.setText(email);  // Set email or other details
         tvAddress.setText(address);  // Set email or other details
-
+        tvGender.setText(gender);
+         // Setup edit profile click listener
+        editProfileButton.setOnClickListener(v -> enableEditing());
         // Setup logout click listener
         logoutButton.setOnClickListener(v -> logout());
 
@@ -111,7 +116,40 @@ private static final int PICK_IMAGE_REQUEST = 1;
             editor.apply();
         }
     }
+private void enableEditing() {
+    // Cho phép chỉnh sửa các trường thông tin
+    profileName.setEnabled(true);
+    emailAddress.setEnabled(true);
+    tvAddress.setEnabled(true);
+    tvGender.setEnabled(true);
 
+    // Thay đổi nút thành "Save"
+    Button editProfileButton = getView().findViewById(R.id.btnEditProfile);
+    editProfileButton.setText("Save");
+    editProfileButton.setOnClickListener(v -> saveProfileChanges());
+}
+
+private void saveProfileChanges() {
+    // Lưu các thay đổi vào SharedPreferences
+    SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putString("username", profileName.getText().toString());
+    editor.putString("email", emailAddress.getText().toString());
+    editor.putString("address", tvAddress.getText().toString());
+    editor.putString("gender", tvGender.getText().toString());
+    editor.apply();
+
+    // Vô hiệu hóa chỉnh sửa
+    profileName.setEnabled(false);
+    emailAddress.setEnabled(false);
+    tvAddress.setEnabled(false);
+    tvGender.setEnabled(false);
+
+    // Thay đổi nút trở lại "Edit Profile"
+    Button editProfileButton = getView().findViewById(R.id.btnEditProfile);
+    editProfileButton.setText("Edit Profile");
+    editProfileButton.setOnClickListener(v -> enableEditing());
+    }
     private void logout() {
         // Clear login state in SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
