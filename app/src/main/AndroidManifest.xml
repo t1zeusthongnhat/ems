@@ -14,14 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExpenseManagementStudent"
         tools:targetApi="31">
-        <!-- Register AllTransactionsActivity -->
-        <activity android:name=".AllTransactionsActivity" />
         <!-- Định nghĩa SplashActivity -->
         <activity
             android:name=".MainActivity"
             android:exported="true" />
         <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".TransactionHistoryActivity" android:exported="true"/>
+        <activity android:name=".EditTransactionActivity" android:exported="true"/>
 
         <activity android:name=".CategoryActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="true"/>

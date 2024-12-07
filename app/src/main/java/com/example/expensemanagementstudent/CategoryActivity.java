@@ -208,13 +208,21 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     // Handle category deletion
+    // Handle category deletion
     private void deleteCategory(int position) {
         Cursor cursor = (Cursor) lvCategories.getItemAtPosition(position);
-        @SuppressLint("Range") String categoryId = cursor.getString(cursor.getColumnIndex(DatabaseHelper.CATEGORY_ID_COL));
+        @SuppressLint("Range") long categoryId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.CATEGORY_ID_COL));
 
-        categoryDB.deleteCategory(Long.parseLong(categoryId));
-        Toast.makeText(this, "Category deleted successfully!", Toast.LENGTH_SHORT).show();
-        displayCategories();
+        // Kiểm tra xem danh mục có đang được sử dụng trong bảng expense hay không
+        if (categoryDB.isCategoryUsedInExpenses(categoryId)) {
+            // Thông báo cho người dùng
+            Toast.makeText(this, "This category is currently in use in expenses. Please delete the expenses first..", Toast.LENGTH_LONG).show();
+        } else {
+            // Tiến hành xóa khi không có khoản chi tiêu liên kết
+            categoryDB.deleteCategory(categoryId);
+            Toast.makeText(this, "Category deleted successfully!", Toast.LENGTH_SHORT).show();
+            displayCategories();
+        }
     }
 
     private void setupIconGrid() {

@@ -199,47 +199,61 @@ public class InsightFragment extends Fragment {
 
 
     private void updateHalfDonutChart(String month, String year) {
-        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 1);  // 0: income
-        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 0);  // 1: expense
+        // Fetch total income and expense values
+        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 1); // 1: income
+        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 0); // 0: expense
 
         float totalIncome = 0;
         float totalExpense = 0;
 
-        if (cursorIncome.moveToFirst()) {
+        if (cursorIncome != null && cursorIncome.moveToFirst()) {
             totalIncome = cursorIncome.getFloat(0);
+            cursorIncome.close();
         }
-        if (cursorExpense.moveToFirst()) {
+        if (cursorExpense != null && cursorExpense.moveToFirst()) {
             totalExpense = cursorExpense.getFloat(0);
+            cursorExpense.close();
         }
 
-        cursorIncome.close();
-        cursorExpense.close();
-
+        // Prepare data for the pie chart
         ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(totalIncome, "Income"));
-        entries.add(new PieEntry(totalExpense, "Expense"));
+        ArrayList<Integer> colors = new ArrayList<>();
 
+        // Add Income and Expense to PieChart
+        if (totalIncome > 0) {
+            entries.add(new PieEntry(totalIncome, "Income"));
+            colors.add(Color.GREEN); // Green for Income
+        }
+        if (totalExpense > 0) {
+            entries.add(new PieEntry(totalExpense, "Expense"));
+            colors.add(Color.RED); // Red for Expense
+        }
+
+        // PieDataSet configuration
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setColors(colors);
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(Color.BLACK);
 
         PieData data = new PieData(dataSet);
         halfDonutChart.setData(data);
 
+        // Configure PieChart for a half-donut view
         halfDonutChart.setUsePercentValues(false);
         halfDonutChart.setDrawHoleEnabled(true);
         halfDonutChart.setHoleRadius(50f);
         halfDonutChart.setTransparentCircleRadius(55f);
 
-        // Customize to make it half donut
-        halfDonutChart.setMaxAngle(180f);  // HALF CHART
+        // Customize for half-donut style
+        halfDonutChart.setMaxAngle(180f); // Limit to half chart
         halfDonutChart.setRotationAngle(180f);
         halfDonutChart.setCenterText("Income vs Expense");
+        halfDonutChart.setCenterTextSize(16f);
 
-        halfDonutChart.invalidate(); // refresh
+        // Refresh the chart
+        halfDonutChart.invalidate();
 
-        // Add comment logic
+        // Add comparison comment logic
         TextView comparisonCommentText = requireView().findViewById(R.id.comparisonCommentText);
         String comment;
         if (totalIncome > totalExpense) {
