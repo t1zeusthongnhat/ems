@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ public class EditTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_transaction);
 
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> onBackPressed());
         // Initialize database helpers
         expenseDB = new ExpenseDB(this);
         categoryDB = new CategoryDB(this);
@@ -145,7 +148,7 @@ public class EditTransactionActivity extends AppCompatActivity {
      * Save changes made to the transaction.
      */
     private void saveTransactionChanges() {
-        String amountText = inputEditAmount.getText().toString().trim();
+        String amountText = inputEditAmount.getText().toString().trim().replace(",", ""); // Remove commas
         String description = inputEditDescription.getText().toString().trim();
         String date = inputEditDate.getText().toString().trim();
         String categoryName = editCategorySpinner.getSelectedItem().toString();
@@ -155,19 +158,21 @@ public class EditTransactionActivity extends AppCompatActivity {
             return;
         }
 
-        double amount = Double.parseDouble(amountText);
-        int categoryId = categoryDB.getCategoryId(categoryName);
+        try {
+            double amount = Double.parseDouble(amountText); // Parse cleaned-up amount
+            int categoryId = categoryDB.getCategoryId(categoryName);
 
-        boolean isUpdated = expenseDB.updateTransaction(transactionId, amount, description, date, categoryId, transactionType);
-        if (isUpdated) {
-            Toast.makeText(this, "Transaction updated successfully", Toast.LENGTH_SHORT).show();
-
-            // Send result to notify the previous activity
-            setResult(RESULT_OK);
-            finish();
-        } else {
-            Toast.makeText(this, "Error updating transaction", Toast.LENGTH_SHORT).show();
+            boolean isUpdated = expenseDB.updateTransaction(transactionId, amount, description, date, categoryId, transactionType);
+            if (isUpdated) {
+                Toast.makeText(this, "Transaction updated successfully", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Error updating transaction", Toast.LENGTH_SHORT).show();
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid amount entered", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }
