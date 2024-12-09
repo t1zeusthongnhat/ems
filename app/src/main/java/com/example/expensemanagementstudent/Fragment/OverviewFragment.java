@@ -1,34 +1,29 @@
 package com.example.expensemanagementstudent.Fragment;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
 import com.example.expensemanagementstudent.TransactionHistoryActivity;
-import com.example.expensemanagementstudent.CategoryActivity; // Import CategoryActivity
+import com.example.expensemanagementstudent.CategoryActivity;
 import com.example.expensemanagementstudent.R;
-import com.example.expensemanagementstudent.TransactionHistoryActivity;
 import com.example.expensemanagementstudent.db.DatabaseHelper;
 import com.example.expensemanagementstudent.db.ExpenseDB;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,17 +31,10 @@ import java.util.Locale;
 
 public class OverviewFragment extends Fragment {
 
-    private TextView monthYearDisplay;
+    private TextView monthYearDisplay, tvIncome, tvExpense, totalBalanceTextView;
     private Calendar calendar;
-    private LinearLayout notificationLayout;
     private LinearLayout transactionListContainer;
     private ExpenseDB expenseDB;
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
 
     public OverviewFragment() {
         // Required empty public constructor
@@ -55,8 +43,8 @@ public class OverviewFragment extends Fragment {
     public static OverviewFragment newInstance(String param1, String param2) {
         OverviewFragment fragment = new OverviewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("param1", param1);
+        args.putString("param2", param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,8 +53,8 @@ public class OverviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            getArguments().getString("param1");
+            getArguments().getString("param2");
         }
     }
 
@@ -74,24 +62,18 @@ public class OverviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
 
-        TextView greetingText = rootView.findViewById(R.id.greetingText);
-        TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
-        LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
         // Initialize the database
         expenseDB = new ExpenseDB(requireContext());
 
-        // Initialize the transaction list container
+        // Initialize views
+        totalBalanceTextView = rootView.findViewById(R.id.total_balance);
+        tvIncome = rootView.findViewById(R.id.tvIncome);
+        tvExpense = rootView.findViewById(R.id.tvExpense);
         transactionListContainer = rootView.findViewById(R.id.transaction_list_container);
-        // Thêm Intent chuyển đến CategoryActivity
-        btnAddCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Chuyển đến CategoryActivity
-                Intent intent = new Intent(getContext(), CategoryActivity.class);
-                startActivity(intent);
-            }
-        });
+
+        TextView greetingText = rootView.findViewById(R.id.greetingText);
+        TextView seeAllButton = rootView.findViewById(R.id.see_all_button);
+        LinearLayout btnAddCategory = rootView.findViewById(R.id.btnAddCategory);
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "Username");
@@ -105,54 +87,79 @@ public class OverviewFragment extends Fragment {
         calendar = Calendar.getInstance();
         updateMonthYearDisplay();
 
-        previousMonth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calendar.add(Calendar.MONTH, -1);
-                updateMonthYearDisplay();
-            }
+        previousMonth.setOnClickListener(v -> {
+            calendar.add(Calendar.MONTH, -1);
+            updateMonthYearDisplay();
+            updateIncomeAndExpense();
         });
-        nextMonth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calendar.add(Calendar.MONTH, 1);
-                updateMonthYearDisplay();
-            }
+        nextMonth.setOnClickListener(v -> {
+            calendar.add(Calendar.MONTH, 1);
+            updateMonthYearDisplay();
+            updateIncomeAndExpense();
         });
 
-        seeAllButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
-                startActivity(intent);
-            }
+        seeAllButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), TransactionHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        btnAddCategory.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), CategoryActivity.class);
+            startActivity(intent);
         });
 
         // Load transactions dynamically into the container
         loadTransactions();
+        updateIncomeAndExpense(); // Update income, expense, and balance values
 
         return rootView;
     }
 
     private void updateMonthYearDisplay() {
-        // Force the locale to English
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy", Locale.ENGLISH);
         String formattedDate = dateFormat.format(calendar.getTime());
         monthYearDisplay.setText(formattedDate);
     }
-    private void toggleNotification() {
-        if (notificationLayout.getVisibility() == View.GONE) {
-            notificationLayout.setVisibility(View.VISIBLE);
-            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_down));
-        } else {
-            notificationLayout.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.slide_up));
-            notificationLayout.setVisibility(View.GONE);
+
+    private void updateIncomeAndExpense() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+
+        // Fetch month and year
+        String month = String.format(Locale.ENGLISH, "%02d", calendar.get(Calendar.MONTH) + 1);
+        String year = String.valueOf(calendar.get(Calendar.YEAR));
+
+        // Fetch total income and expense
+        Cursor cursorIncome = expenseDB.getTotalByType(userId, month, year, 1); // 1: Income
+        Cursor cursorExpense = expenseDB.getTotalByType(userId, month, year, 0); // 0: Expense
+
+        float totalIncome = 0;
+        float totalExpense = 0;
+
+        if (cursorIncome != null && cursorIncome.moveToFirst()) {
+            totalIncome = cursorIncome.getFloat(0);
+            cursorIncome.close();
         }
+
+        if (cursorExpense != null && cursorExpense.moveToFirst()) {
+            totalExpense = cursorExpense.getFloat(0);
+            cursorExpense.close();
+        }
+
+        // Update TextViews
+        tvIncome.setText(String.format("$%,.0f", totalIncome));
+        tvExpense.setText(String.format("$%,.0f", totalExpense));
+
+        // Update total balance
+        double totalBalance = totalIncome - totalExpense;
+        totalBalanceTextView.setText(String.format("$%,.0f", totalBalance));
     }
+
     @Override
     public void onResume() {
         super.onResume();
         loadTransactions(); // Reload the transactions when the fragment is resumed
+        updateIncomeAndExpense();
     }
 
     private void loadTransactions() {
@@ -183,15 +190,6 @@ public class OverviewFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            loadTransactions(); // Reload transactions after adding a new one
-        }
-    }
-
     private void addTransactionItem(String category, String description, double amount, int type, String date) {
         View transactionItem = LayoutInflater.from(getContext()).inflate(R.layout.transaction_item_overview, transactionListContainer, false);
 
@@ -200,11 +198,8 @@ public class OverviewFragment extends Fragment {
         TextView amountView = transactionItem.findViewById(R.id.transaction_amount);
         TextView dateView = transactionItem.findViewById(R.id.transaction_date);
 
-        // Find the Edit and Delete buttons
         View editButton = transactionItem.findViewById(R.id.btn_edit_transaction);
         View deleteButton = transactionItem.findViewById(R.id.btn_delete_transaction);
-
-        // Hide the buttons
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
 
@@ -212,17 +207,14 @@ public class OverviewFragment extends Fragment {
         descriptionView.setText(description);
         dateView.setText(date);
 
-        // Format the amount with a "+" or "-" and apply color based on type
         if (type == 1) { // Income
-            amountView.setText(String.format("+ %, .2f $", amount));
+            amountView.setText(String.format("+ %, .0f $", amount));
             amountView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
         } else { // Expense
-            amountView.setText(String.format("- %, .2f $", amount));
+            amountView.setText(String.format("- %, .0f $", amount));
             amountView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
         }
 
         transactionListContainer.addView(transactionItem);
     }
-
-
 }
