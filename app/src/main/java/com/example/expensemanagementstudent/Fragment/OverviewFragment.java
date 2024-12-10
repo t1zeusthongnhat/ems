@@ -1,11 +1,15 @@
 package com.example.expensemanagementstudent.Fragment;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.expensemanagementstudent.TransactionHistoryActivity;
@@ -35,6 +42,12 @@ public class OverviewFragment extends Fragment {
     private Calendar calendar;
     private LinearLayout transactionListContainer;
     private ExpenseDB expenseDB;
+
+    private static final String PREFS_NAME = "NotificationPrefs";
+    private static final String LAST_NOTIFICATION_TIME = "lastNotificationTime";
+    private static final String LAST_BALANCE = "lastBalance";
+    private static final long NOTIFICATION_COOLDOWN = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private boolean notificationsEnabled = true;
 
     public OverviewFragment() {
         // Required empty public constructor
@@ -108,6 +121,23 @@ public class OverviewFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Initialize views
+        ImageView notificationIcon = rootView.findViewById(R.id.notificationIcon);
+
+        // Load the current notification state
+        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        notificationsEnabled = prefs.getBoolean("notificationsEnabled", true);
+
+        // Set initial icon based on the state
+        updateNotificationIcon(notificationIcon);
+
+        // Handle notification icon click
+        notificationIcon.setOnClickListener(v -> {
+            notificationsEnabled = !notificationsEnabled; // Toggle the state
+            saveNotificationState(notificationsEnabled);  // Save the new state
+            updateNotificationIcon(notificationIcon);     // Update the icon
+            showNotificationToggleMessage();              // Show a message
+        });
         // Load transactions dynamically into the container
         loadTransactions();
         updateIncomeAndExpense(); // Update income, expense, and balance values
@@ -153,7 +183,74 @@ public class OverviewFragment extends Fragment {
         // Update total balance
         double totalBalance = totalIncome - totalExpense;
         totalBalanceTextView.setText(String.format("$%,.0f", totalBalance));
+
+        // Check for income threshold
+        checkIncomeThreshold(totalIncome, totalBalance);
     }
+
+    private void checkIncomeThreshold(float totalIncome, double totalBalance) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        long lastNotificationTime = prefs.getLong(LAST_NOTIFICATION_TIME, 0);
+        double lastNotifiedBalance = Double.longBitsToDouble(prefs.getLong(LAST_BALANCE, Double.doubleToLongBits(0)));
+
+        // Current time
+        long currentTime = System.currentTimeMillis();
+
+        // Calculate threshold
+        float veryLowBalanceThreshold = totalIncome * 0.2f;
+
+        // Check cooldown and balance change
+        if (currentTime - lastNotificationTime < NOTIFICATION_COOLDOWN && totalBalance == lastNotifiedBalance) {
+            return; // Skip notification if within cooldown and no balance change
+        }
+
+        // Trigger notification for very low balance
+        if (totalBalance < veryLowBalanceThreshold && totalBalance >= 0) {
+            sendNotification("Critical: Very Low Balance", "Your balance is below 20% of your income. Immediate action is required.");
+            saveNotificationState(currentTime, totalBalance);
+            return;
+        }
+
+        // Trigger notification for negative balance
+        if (totalBalance < 0) {
+            sendNotification("Critical: Negative Balance", "Your balance is negative. Please review your expenses immediately.");
+            saveNotificationState(currentTime, totalBalance);
+        }
+    }
+
+
+    // Update the notification icon based on the current state
+    private void updateNotificationIcon(ImageView notificationIcon) {
+        if (notificationsEnabled) {
+            notificationIcon.setImageResource(R.drawable.bell); // Replace with your "bell" icon
+        } else {
+            notificationIcon.setImageResource(R.drawable.bell_off); // Replace with your "bell_off" icon
+        }
+    }
+
+    // Save the notification state in SharedPreferences
+    private void saveNotificationState(boolean enabled) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("notificationsEnabled", enabled);
+        editor.apply();
+    }
+
+    // Show a message when notifications are toggled
+    private void showNotificationToggleMessage() {
+        String message = notificationsEnabled ? "Notifications Enabled" : "Notifications Turned Off";
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Save the state of the last notification
+    private void saveNotificationState(long currentTime, double totalBalance) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(LAST_NOTIFICATION_TIME, currentTime);
+        editor.putLong(LAST_BALANCE, Double.doubleToLongBits(totalBalance));
+        editor.apply();
+    }
+
 
     @Override
     public void onResume() {
@@ -217,4 +314,57 @@ public class OverviewFragment extends Fragment {
 
         transactionListContainer.addView(transactionItem);
     }
+
+    private void sendNotification(String title, String message) {
+        // Check for Notification Permission (Android 13+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (requireContext().checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Request the permission
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 100);
+                return; // Exit to wait for permission response
+            }
+        }
+
+        // Create Notification Channel (for Android 8.0+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "income_notification_channel",
+                    "Income Notifications",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            NotificationManager manager = requireActivity().getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
+        // Build the notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "income_notification_channel")
+                .setSmallIcon(R.drawable.ic_notification) // Replace with your app's notification icon
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        // Show the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
+        notificationManager.notify(1, builder.build());
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, send the notification
+                sendNotification("Permission Granted", "You can now receive notifications.");
+            } else {
+                // Permission denied
+                Toast.makeText(requireContext(), "Notification permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 }
